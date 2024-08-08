@@ -1,27 +1,32 @@
 // src/pages/ExpenseListPage.tsx
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ExpenseList from '../components/ExpenseList';
+import { getExpensesFromLocalStorage, saveExpensesToLocalStorage } from '../utils/localStorageHelpers';
+import { useNavigate } from 'react-router-dom';
 import { Expense } from '../types/Expense';
 
 const ExpenseListPage: React.FC = () => {
-  // Dummy data for testing
-  const expenses: Expense[] = [
-    {
-      date: '2024-08-01',
-      amount: 50,
-      title: 'Groceries',
-      category: 'Food',
-      paymentMode: 'Digital',
-      recurring: false,
-      beneficiary: 'Self',
-      tags: ['Essentials'],
-    },
-    // More dummy data can be added
-  ];
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setExpenses(getExpensesFromLocalStorage());
+  }, []);
+
+  const handleDeleteExpense = useCallback((index: number) => {
+    const updatedExpenses = [...expenses];
+    updatedExpenses.splice(index, 1);
+    setExpenses(updatedExpenses);
+    saveExpensesToLocalStorage(updatedExpenses);
+  }, [setExpenses, expenses]);
+
+  const handleEditExpense = useCallback((index: number) => {
+    navigate('/', { state: { expense: expenses[index], index } });
+  }, [navigate, expenses]);
 
   return (
     <div>
-      <ExpenseList expenses={expenses} onDeleteExpense={(index) => console.log('Delete expense at index:', index)} />
+      <ExpenseList expenses={expenses} onDeleteExpense={handleDeleteExpense} onEditExpense={handleEditExpense} />
     </div>
   );
 };

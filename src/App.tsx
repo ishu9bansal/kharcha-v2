@@ -29,6 +29,7 @@ function App() {
           <Tabs value={value} onChange={handleChange} centered>
             {AllTabs.map((tab: HeaderTab) => (
               <Tab
+                key={tab}
                 label={t(TabLabel[tab])}
                 component={Link}
                 to={TabPath[tab]}

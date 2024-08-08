@@ -1,5 +1,5 @@
 // src/components/ExpenseForm.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   Grid,
@@ -20,9 +20,10 @@ import { Expense } from '../types/Expense';
 
 interface ExpenseFormProps {
   onSaveExpense: (expense: Expense) => void;
+  initialData?: Expense | null;
 }
 
-const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSaveExpense }) => {
+const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSaveExpense, initialData }) => {
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [amount, setAmount] = useState<string>('');
   const [title, setTitle] = useState<string>('');
@@ -33,19 +34,23 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSaveExpense }) => {
   const [beneficiary, setBeneficiary] = useState<'Self' | 'Family' | 'Friends' | 'Vehicle'>('Self');
   const [tags, setTags] = useState<string>('');
 
+  useEffect(() => {
+    if (initialData) {
+      setDate(initialData.date);
+      setAmount(initialData.amount.toString());
+      setTitle(initialData.title);
+      setCategory(initialData.category);
+      setPaymentMode(initialData.paymentMode);
+      setRecurring(initialData.recurring);
+      setBeneficiary(initialData.beneficiary);
+      setTags(initialData.tags.join(', '));
+    }
+  }, [initialData]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const finalCategory = category || newCategory;
     onSaveExpense({ date, amount: +amount, title, category: finalCategory, paymentMode, recurring, beneficiary, tags: tags.split(',') });
-    setDate(new Date().toISOString().split('T')[0]);
-    setAmount('');
-    setTitle('');
-    setCategory('');
-    setNewCategory('');
-    setPaymentMode('Digital');
-    setRecurring(false);
-    setBeneficiary('Self');
-    setTags('');
   };
 
   return (
@@ -78,7 +83,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSaveExpense }) => {
           </Grid>
           <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary" fullWidth>
-              Add Expense
+              {initialData ? 'Update Expense' : 'Add Expense'}
             </Button>
           </Grid>
         </Grid>
