@@ -1,15 +1,16 @@
-// src/components/Inputs.tsx
 import React from 'react';
 import {
-  TextField,
+  Box,
   FormControl,
-  FormControlLabel,
+  FormLabel,
   Grid,
+  TextField,
   Typography,
   ToggleButton,
   ToggleButtonGroup,
   Switch,
   FormGroup,
+  FormControlLabel,
 } from '@mui/material';
 
 export const DateInput: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => (
@@ -60,31 +61,33 @@ export const CategoryInput: React.FC<{
 
   return (
     <FormControl component="fieldset" fullWidth>
-      <Typography component="legend">Category</Typography>
-      <Grid container spacing={2}>
-        {categories.map((category) => (
-          <Grid item xs={6} sm={3} key={category}>
-            <ToggleButtonGroup
-              value={selectedCategory}
-              exclusive
-              onChange={(e, value) => onChange(value)}
-              fullWidth
-            >
-              <ToggleButton value={category} style={{ width: '100%' }}>
-                {category}
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Grid>
-        ))}
-      </Grid>
-      <TextField
-        label="Add New Category"
-        type="text"
-        value={newCategory}
-        onChange={(e) => onNewCategoryChange(e.target.value)}
-        fullWidth
-        sx={{ mt: 2 }}
-      />
+      <Box border={1} borderColor="grey.500" borderRadius={2} p={2} mt={1}>
+        <FormLabel component="legend">Category</FormLabel>
+        <Grid container spacing={2} mt={1}>
+          {categories.map((category) => (
+            <Grid item xs={6} sm={3} key={category}>
+              <ToggleButtonGroup
+                value={selectedCategory}
+                exclusive
+                onChange={(e, value) => onChange(value)}
+                fullWidth
+              >
+                <ToggleButton value={category} style={{ width: '100%' }}>
+                  {category}
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Grid>
+          ))}
+        </Grid>
+        <TextField
+          label="Add New Category"
+          type="text"
+          value={newCategory}
+          onChange={(e) => onNewCategoryChange(e.target.value)}
+          fullWidth
+          sx={{ mt: 2 }}
+        />
+      </Box>
     </FormControl>
   );
 };
@@ -94,30 +97,34 @@ export const PaymentModeInput: React.FC<{
   onChange: (value: 'Cash' | 'Digital') => void;
 }> = ({ selectedMode, onChange }) => (
   <FormControl component="fieldset" fullWidth>
-    <Typography component="legend">Payment Mode</Typography>
-    <ToggleButtonGroup
-      value={selectedMode}
-      exclusive
-      onChange={(e, value) => onChange(value)}
-      fullWidth
-    >
-      <ToggleButton value="Cash">Cash</ToggleButton>
-      <ToggleButton value="Digital">Digital</ToggleButton>
-    </ToggleButtonGroup>
+    <Box border={1} borderColor="grey.500" borderRadius={2} p={2} mt={1}>
+      <FormLabel component="legend">Payment Mode</FormLabel>
+      <ToggleButtonGroup
+        value={selectedMode}
+        exclusive
+        onChange={(e, value) => onChange(value)}
+        fullWidth
+      >
+        <ToggleButton value="Cash">Cash</ToggleButton>
+        <ToggleButton value="Digital">Digital</ToggleButton>
+      </ToggleButtonGroup>
+    </Box>
   </FormControl>
 );
 
 export const RecurringInput: React.FC<{ value: boolean, onChange: (value: boolean) => void }> = ({ value, onChange }) => (
   <FormGroup>
-    <FormControlLabel
-      control={
-        <Switch
-          checked={value}
-          onChange={() => onChange(!value)}
-        />
-      }
-      label="Recurring"
-    />
+    <Box border={1} borderColor="grey.500" borderRadius={2} p={2} mt={1}>
+      <FormControlLabel
+        control={
+          <Switch
+            checked={value}
+            onChange={() => onChange(!value)}
+          />
+        }
+        label="Recurring"
+      />
+    </Box>
   </FormGroup>
 );
 
@@ -126,18 +133,20 @@ export const BeneficiaryInput: React.FC<{
   onChange: (value: 'Self' | 'Family' | 'Friends' | 'Vehicle') => void;
 }> = ({ selectedBeneficiary, onChange }) => (
   <FormControl component="fieldset" fullWidth>
-    <Typography component="legend">Beneficiary</Typography>
-    <ToggleButtonGroup
-      value={selectedBeneficiary}
-      exclusive
-      onChange={(e, value) => onChange(value)}
-      fullWidth
-    >
-      <ToggleButton value="Self">Self</ToggleButton>
-      <ToggleButton value="Family">Family</ToggleButton>
-      <ToggleButton value="Friends">Friends</ToggleButton>
-      <ToggleButton value="Vehicle">Vehicle</ToggleButton>
-    </ToggleButtonGroup>
+    <Box border={1} borderColor="grey.500" borderRadius={2} p={2} mt={1}>
+      <FormLabel component="legend">Beneficiary</FormLabel>
+      <ToggleButtonGroup
+        value={selectedBeneficiary}
+        exclusive
+        onChange={(e, value) => onChange(value)}
+        fullWidth
+      >
+        <ToggleButton value="Self">Self</ToggleButton>
+        <ToggleButton value="Family">Family</ToggleButton>
+        <ToggleButton value="Friends">Friends</ToggleButton>
+        <ToggleButton value="Vehicle">Vehicle</ToggleButton>
+      </ToggleButtonGroup>
+    </Box>
   </FormControl>
 );
 
