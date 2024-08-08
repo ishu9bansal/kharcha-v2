@@ -82,7 +82,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSaveExpense, initialData })
             <RecurringInput value={recurring} onChange={setRecurring} />
           </Grid>
           <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary" fullWidth>
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{
+              margin: '0 0 20px 0',
+            }}>
               {initialData ? 'Update Expense' : 'Add Expense'}
             </Button>
           </Grid>
