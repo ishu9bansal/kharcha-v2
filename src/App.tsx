@@ -1,9 +1,22 @@
 // src/App.tsx
 import React, { useState } from 'react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import ExpenseForm from './components/ExpenseForm';
 import ExpenseList from './components/ExpenseList';
-import './App.css';
 import { Expense } from './types/Expense';
+import './App.css';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#dc004e',
+    },
+  },
+});
 
 const App: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -19,12 +32,15 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="App">
-      <h1>Daily Expense Tracker</h1>
-      <ExpenseForm onSaveExpense={handleSaveExpense} />
-      <h2>Expense List</h2>
-      <ExpenseList expenses={expenses} onDeleteExpense={handleDeleteExpense} />
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <div className="App">
+        <h1>Daily Expense Tracker</h1>
+        <ExpenseForm onSaveExpense={handleSaveExpense} />
+        <h2>Expense List</h2>
+        <ExpenseList expenses={expenses} onDeleteExpense={handleDeleteExpense} />
+      </div>
+    </ThemeProvider>
   );
 };
 

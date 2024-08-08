@@ -1,7 +1,27 @@
 // src/components/ExpenseForm.tsx
 import React, { useState } from 'react';
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Grid,
+  Radio,
+  RadioGroup,
+  TextField,
+} from '@mui/material';
 import { Expense } from '../types/Expense';
-import { DateInput, AmountInput, TitleInput, CategoryInput, PaymentModeInput, RecurringInput, BeneficiaryInput, TagsInput } from './Inputs';
+import {
+  DateInput,
+  AmountInput,
+  TitleInput,
+  CategoryInput,
+  PaymentModeInput,
+  RecurringInput,
+  BeneficiaryInput,
+  TagsInput,
+} from './Inputs';
 
 interface ExpenseFormProps {
   onSaveExpense: (expense: Expense) => void;
@@ -35,15 +55,37 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSaveExpense }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <DateInput value={date} onChange={setDate} />
-      <AmountInput value={amount} onChange={setAmount} />
-      <TitleInput value={title} onChange={setTitle} />
-      <CategoryInput selectedCategory={category} onChange={setCategory} newCategory={newCategory} onNewCategoryChange={setNewCategory} />
-      <PaymentModeInput selectedMode={paymentMode} onChange={setPaymentMode} />
-      <RecurringInput value={recurring} onChange={setRecurring} />
-      <BeneficiaryInput selectedBeneficiary={beneficiary} onChange={setBeneficiary} />
-      <TagsInput value={tags} onChange={setTags} />
-      <button type="submit">Add Expense</button>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <DateInput value={date} onChange={setDate} />
+        </Grid>
+        <Grid item xs={12}>
+          <AmountInput value={amount} onChange={setAmount} />
+        </Grid>
+        <Grid item xs={12}>
+          <TitleInput value={title} onChange={setTitle} />
+        </Grid>
+        <Grid item xs={12}>
+          <CategoryInput selectedCategory={category} onChange={setCategory} newCategory={newCategory} onNewCategoryChange={setNewCategory} />
+        </Grid>
+        <Grid item xs={12}>
+          <PaymentModeInput selectedMode={paymentMode} onChange={setPaymentMode} />
+        </Grid>
+        <Grid item xs={12}>
+          <RecurringInput value={recurring} onChange={setRecurring} />
+        </Grid>
+        <Grid item xs={12}>
+          <BeneficiaryInput selectedBeneficiary={beneficiary} onChange={setBeneficiary} />
+        </Grid>
+        <Grid item xs={12}>
+          <TagsInput value={tags} onChange={setTags} />
+        </Grid>
+        <Grid item xs={12}>
+          <Button type="submit" variant="contained" color="primary">
+            Add Expense
+          </Button>
+        </Grid>
+      </Grid>
     </form>
   );
 };
