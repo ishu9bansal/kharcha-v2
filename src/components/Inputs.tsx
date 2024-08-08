@@ -61,18 +61,22 @@ export const CategoryInput: React.FC<{
   return (
     <FormControl component="fieldset" fullWidth>
       <Typography component="legend">Category</Typography>
-      <ToggleButtonGroup
-        value={selectedCategory}
-        exclusive
-        onChange={(e, value) => onChange(value)}
-        fullWidth
-      >
+      <Grid container spacing={2}>
         {categories.map((category) => (
-          <ToggleButton key={category} value={category}>
-            {category}
-          </ToggleButton>
+          <Grid item xs={6} sm={3} key={category}>
+            <ToggleButtonGroup
+              value={selectedCategory}
+              exclusive
+              onChange={(e, value) => onChange(value)}
+              fullWidth
+            >
+              <ToggleButton value={category} style={{ width: '100%' }}>
+                {category}
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Grid>
         ))}
-      </ToggleButtonGroup>
+      </Grid>
       <TextField
         label="Add New Category"
         type="text"
