@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import { AppBar, Tabs, Tab, Container } from "@mui/material";
 import ExpenseFormPage from "./pages/ExpenseFormPage";
 import ExpenseListPage from "./pages/ExpenseListPage";
-import { selectedTabStyle } from "./App.style";
+import { contentContainerStyle, selectedTabStyle } from "./App.style";
 import { useTranslation } from "react-i18next";
 import { setUpLocales } from "./i18n";
 import { AllTabs, HeaderTab, TabLabel, TabPath } from "./constants/TabConstants";
@@ -38,7 +38,7 @@ function App() {
           </Tabs>
         </Container>
       </AppBar>
-      <Container sx={{ mt: 4 }}>
+      <Container sx={contentContainerStyle}>
         <Routes>
           <Route path={TabPath[HeaderTab.AddExpense]} element={<ExpenseFormPage />} />
           <Route path={TabPath[HeaderTab.ViewExpenses]} element={<ExpenseListPage />} />
