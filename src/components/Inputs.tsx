@@ -51,75 +51,31 @@ export const CategoryInput: React.FC<{
   return (
     <FormControl component="fieldset" fullWidth>
       <Typography component="legend">Category</Typography>
-      <RadioGroup
-        value={selectedCategory}
-        onChange={(e) => onChange(e.target.value)}
-      >
+      <Grid container spacing={2}>
         {categories.map((category) => (
-          <FormControlLabel
-            key={category}
-            value={category}
-            control={<Radio />}
-            label={category}
-          />
+          <Grid item xs={6} sm={4} md={3} key={category}>
+            <FormControlLabel
+              control={<Radio />}
+              label={category}
+              value={category}
+              checked={selectedCategory === category}
+              onChange={() => onChange(category)}
+            />
+          </Grid>
         ))}
-        <TextField
-          label="Add New Category"
-          type="text"
-          value={newCategory}
-          onChange={(e) => onNewCategoryChange(e.target.value)}
-          fullWidth
-        />
-      </RadioGroup>
+        <Grid item xs={12}>
+          <TextField
+            label="Add New Category"
+            type="text"
+            value={newCategory}
+            onChange={(e) => onNewCategoryChange(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+      </Grid>
     </FormControl>
   );
 };
-
-export const PaymentModeInput: React.FC<{
-  selectedMode: 'Cash' | 'Digital';
-  onChange: (value: 'Cash' | 'Digital') => void;
-}> = ({ selectedMode, onChange }) => (
-  <FormControl component="fieldset" fullWidth>
-    <Typography component="legend">Payment Mode</Typography>
-    <RadioGroup
-      value={selectedMode}
-      onChange={(e) => onChange(e.target.value as 'Cash' | 'Digital')}
-    >
-      <FormControlLabel value="Cash" control={<Radio />} label="Cash" />
-      <FormControlLabel value="Digital" control={<Radio />} label="Digital" />
-    </RadioGroup>
-  </FormControl>
-);
-
-export const RecurringInput: React.FC<{ value: boolean, onChange: (value: boolean) => void }> = ({ value, onChange }) => (
-  <FormControlLabel
-    control={
-      <Checkbox
-        checked={value}
-        onChange={() => onChange(!value)}
-      />
-    }
-    label="Recurring"
-  />
-);
-
-export const BeneficiaryInput: React.FC<{
-  selectedBeneficiary: 'Self' | 'Family' | 'Friends' | 'Vehicle';
-  onChange: (value: 'Self' | 'Family' | 'Friends' | 'Vehicle') => void;
-}> = ({ selectedBeneficiary, onChange }) => (
-  <FormControl component="fieldset" fullWidth>
-    <Typography component="legend">Beneficiary</Typography>
-    <RadioGroup
-      value={selectedBeneficiary}
-      onChange={(e) => onChange(e.target.value as 'Self' | 'Family' | 'Friends' | 'Vehicle')}
-    >
-      <FormControlLabel value="Self" control={<Radio />} label="Self" />
-      <FormControlLabel value="Family" control={<Radio />} label="Family" />
-      <FormControlLabel value="Friends" control={<Radio />} label="Friends" />
-      <FormControlLabel value="Vehicle" control={<Radio />} label="Vehicle" />
-    </RadioGroup>
-  </FormControl>
-);
 
 export const TagsInput: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => (
   <TextField
