@@ -16,9 +16,9 @@ const ExpenseListPage: React.FC = () => {
   const handleDeleteExpense = useCallback((index: number) => {
     const updatedExpenses = [...expenses];
     updatedExpenses.splice(index, 1);
-    setExpenses(updatedExpenses);
     saveExpensesToLocalStorage(updatedExpenses);
-  }, [setExpenses, expenses]);
+    setExpenses(updatedExpenses);
+  }, [expenses]);
 
   const handleEditExpense = useCallback((index: number) => {
     navigate('/', { state: { expense: expenses[index], index } });
