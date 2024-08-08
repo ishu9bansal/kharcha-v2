@@ -1,6 +1,6 @@
 // src/App.tsx
-import React, { useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import React, { useCallback, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes, Link, useLocation } from "react-router-dom";
 import { AppBar, Tabs, Tab, Container } from "@mui/material";
 import ExpenseFormPage from "./pages/ExpenseFormPage";
 import ExpenseListPage from "./pages/ExpenseListPage";
@@ -10,11 +10,12 @@ import { setUpLocales } from "./i18n";
 import { AllTabs, HeaderTab, TabLabel, TabPath } from "./constants/TabConstants";
 
 function App() {
-  const [value, setValue] = React.useState(0);
+  const location = useLocation();
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setValue(newValue);
-  };
+  // Determine the active tab based on the current path
+  const getActiveTab = useCallback(() => {
+    return AllTabs.findIndex((tab: HeaderTab) => TabPath[tab] === location.pathname);
+  }, [location]);
 
   useEffect(() => {
     setUpLocales();
@@ -23,10 +24,10 @@ function App() {
   const { t } = useTranslation();
 
   return (
-    <Router>
+    <>
       <AppBar position="sticky">
         <Container>
-          <Tabs value={value} onChange={handleChange} centered>
+          <Tabs value={getActiveTab()} centered>
             {AllTabs.map((tab: HeaderTab) => (
               <Tab
                 key={tab}
@@ -45,8 +46,14 @@ function App() {
           <Route path={TabPath[HeaderTab.ViewExpenses]} element={<ExpenseListPage />} />
         </Routes>
       </Container>
-    </Router>
+    </>
   );
 }
 
-export default App;
+export default function AppWithRouter() {
+  return (
+    <Router>
+      <App />
+    </Router>
+  );
+}
