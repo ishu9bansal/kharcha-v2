@@ -1,47 +1,35 @@
 // src/App.tsx
-import React, { useState } from 'react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import ExpenseForm from './components/ExpenseForm';
-import ExpenseList from './components/ExpenseList';
-import { Expense } from './types/Expense';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { AppBar, Tabs, Tab, Container } from '@mui/material';
+import ExpenseFormPage from './pages/ExpenseFormPage';
+import ExpenseListPage from './pages/ExpenseListPage';
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-  },
-});
+function App() {
+  const [value, setValue] = React.useState(0);
 
-const App: React.FC = () => {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-
-  const handleSaveExpense = (expense: Expense) => {
-    setExpenses([...expenses, expense]);
-  };
-
-  const handleDeleteExpense = (index: number) => {
-    const updatedExpenses = [...expenses];
-    updatedExpenses.splice(index, 1);
-    setExpenses(updatedExpenses);
+  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setValue(newValue);
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <div className="App">
-        <h1>Daily Expense Tracker</h1>
-        <ExpenseForm onSaveExpense={handleSaveExpense} />
-        <h2>Expense List</h2>
-        <ExpenseList expenses={expenses} onDeleteExpense={handleDeleteExpense} />
-      </div>
-    </ThemeProvider>
+    <Router>
+      <AppBar position="static">
+        <Container>
+          <Tabs value={value} onChange={handleChange} centered>
+            <Tab label="Add Expense" component={Link} to="/" />
+            <Tab label="View Expenses" component={Link} to="/expenses" />
+          </Tabs>
+        </Container>
+      </AppBar>
+      <Container sx={{ mt: 4 }}>
+        <Routes>
+          <Route path="/" element={<ExpenseFormPage />} />
+          <Route path="/expenses" element={<ExpenseListPage />} />
+        </Routes>
+      </Container>
+    </Router>
   );
-};
+}
 
 export default App;
