@@ -26,3 +26,8 @@ jobs:
       run: |
         npm install
         npx webpack
+    - name: Deploy React to GitHub Pages
+      # You may pin to the exact commit or the version.
+      # uses: bitovi/github-actions-react-to-github-pages@4cf343888989e21112bce7e59156242a0e1defb3
+      uses: bitovi/github-actions-react-to-github-pages@v1.2.4
+              
