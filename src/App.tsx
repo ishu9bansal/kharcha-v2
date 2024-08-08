@@ -7,6 +7,7 @@ import ExpenseListPage from "./pages/ExpenseListPage";
 import { selectedTabStyle } from "./App.style";
 import { useTranslation } from "react-i18next";
 import { setUpLocales } from "./i18n";
+import { AllTabs, HeaderTab, TabLabel, TabPath } from "./constants/TabConstants";
 
 function App() {
   const [value, setValue] = React.useState(0);
@@ -26,25 +27,21 @@ function App() {
       <AppBar position="sticky">
         <Container>
           <Tabs value={value} onChange={handleChange} centered>
-            <Tab
-              label={t("tab-label-add-expense")}
-              component={Link}
-              to="/"
-              sx={selectedTabStyle}
-            />
-            <Tab
-              label={t("tab-label-view-expenses")}
-              component={Link}
-              to="/expenses"
-              sx={selectedTabStyle}
-            />
+            {AllTabs.map((tab: HeaderTab) => (
+              <Tab
+                label={t(TabLabel[tab])}
+                component={Link}
+                to={TabPath[tab]}
+                sx={selectedTabStyle}
+              />
+            ))}
           </Tabs>
         </Container>
       </AppBar>
       <Container sx={{ mt: 4 }}>
         <Routes>
-          <Route path="/" element={<ExpenseFormPage />} />
-          <Route path="/expenses" element={<ExpenseListPage />} />
+          <Route path={TabPath[HeaderTab.AddExpense]} element={<ExpenseFormPage />} />
+          <Route path={TabPath[HeaderTab.ViewExpenses]} element={<ExpenseListPage />} />
         </Routes>
       </Container>
     </Router>
