@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react
 import { AppBar, Tabs, Tab, Container } from '@mui/material';
 import ExpenseFormPage from './pages/ExpenseFormPage';
 import ExpenseListPage from './pages/ExpenseListPage';
+import { selectedTabStyle } from './App.style';
 
 function App() {
   const [value, setValue] = React.useState(0);
@@ -14,32 +15,20 @@ function App() {
 
   return (
     <Router>
-      <AppBar position="static">
+      <AppBar position="sticky">
         <Container>
         <Tabs value={value} onChange={handleChange} centered>
             <Tab
               label="Add Expense"
               component={Link}
               to="/"
-              sx={{
-                '&.Mui-selected': {
-                  backgroundColor: '#fff',
-                  color: '#1976d2',
-                  borderRadius: '8px 8px 0 0',
-                },
-              }}
+              sx={selectedTabStyle}
             />
             <Tab
               label="View Expenses"
               component={Link}
               to="/expenses"
-              sx={{
-                '&.Mui-selected': {
-                  backgroundColor: '#fff',
-                  color: '#1976d2',
-                  borderRadius: '8px 8px 0 0',
-                },
-              }}
+              sx={selectedTabStyle}
             />
           </Tabs>
         </Container>
