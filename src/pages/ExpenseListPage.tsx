@@ -1,28 +1,36 @@
 // src/pages/ExpenseListPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import ExpenseList from '../components/ExpenseList';
-import { getExpensesFromLocalStorage, saveExpensesToLocalStorage } from '../utils/localStorageHelpers';
+import { IExpenseService } from '../services/IExpenseService';
+import { LocalStorageService } from '../services/LocalStorageService';
 import { useNavigate } from 'react-router-dom';
 import { Expense } from '../types/Expense';
 
-const ExpenseListPage: React.FC = () => {
+interface ExpenseListPageProps {
+  expenseService: IExpenseService;
+}
+
+const ExpenseListPage: React.FC<ExpenseListPageProps> = ({ expenseService }) => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setExpenses(getExpensesFromLocalStorage());
-  }, []);
+    const fetchExpenses = async () => {
+      const data = await expenseService.getExpenses();
+      setExpenses(data);
+    };
 
-  const handleDeleteExpense = useCallback((index: number) => {
-    const updatedExpenses = [...expenses];
-    updatedExpenses.splice(index, 1);
-    saveExpensesToLocalStorage(updatedExpenses);
-    setExpenses(updatedExpenses);
-  }, [expenses, setExpenses]);
+    fetchExpenses();
+  }, [expenseService]);
 
   const handleEditExpense = useCallback((index: number) => {
     navigate('/', { state: { expense: expenses[index], index } });
   }, [navigate, expenses]);
+
+  const handleDeleteExpense = useCallback(async (index: number) => {
+    await expenseService.deleteExpense(index);
+    setExpenses(await expenseService.getExpenses());
+  }, [expenses, expenseService]);
 
   return (
     <div>
@@ -31,4 +39,6 @@ const ExpenseListPage: React.FC = () => {
   );
 };
 
-export default ExpenseListPage;
+// Use Singleton instance of LocalStorageService by default
+const DefaultExpenseListPage = () => <ExpenseListPage expenseService={LocalStorageService.getInstance()} />;
+export default DefaultExpenseListPage;

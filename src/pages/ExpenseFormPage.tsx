@@ -1,17 +1,21 @@
 // src/pages/ExpenseFormPage.tsx
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import ExpenseForm from '../components/ExpenseForm';
-import { addExpenseToLocalStorage, updateExpenseInLocalStorage, getExpensesFromLocalStorage } from '../utils/localStorageHelpers';
+import { IExpenseService } from '../services/IExpenseService';
+import { LocalStorageService } from '../services/LocalStorageService';
 import { Expense } from '../types/Expense';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const ExpenseFormPage: React.FC = () => {
+interface ExpenseFormPageProps {
+  expenseService: IExpenseService;
+}
+
+const ExpenseFormPage: React.FC<ExpenseFormPageProps> = ({ expenseService }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [initialExpenseData, setInitialExpenseData] = useState<Expense | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Load expense data if editing
   React.useEffect(() => {
     const state = location.state as { expense: Expense, index: number } | undefined;
     if (state) {
@@ -20,15 +24,15 @@ const ExpenseFormPage: React.FC = () => {
     }
   }, [location.state]);
 
-  const handleSaveExpense = useCallback((expense: Expense) => {
+  const handleSaveExpense = async (expense: Expense) => {
     if (editingIndex !== null) {
-      updateExpenseInLocalStorage(editingIndex, expense);
+      await expenseService.updateExpense(editingIndex, expense);
       setEditingIndex(null);
     } else {
-      addExpenseToLocalStorage(expense);
+      await expenseService.addExpense(expense);
     }
     navigate('/expenses');
-  }, [navigate, setEditingIndex, editingIndex]);
+  };
 
   return (
     <div>
@@ -37,4 +41,6 @@ const ExpenseFormPage: React.FC = () => {
   );
 };
 
-export default ExpenseFormPage;
+// Use Singleton instance of LocalStorageService by default
+const DefaultExpenseFormPage = () => <ExpenseFormPage expenseService={LocalStorageService.getInstance()} />;
+export default DefaultExpenseFormPage;
