@@ -28,7 +28,7 @@ const ExpenseFormPage: React.FC = () => {
       addExpenseToLocalStorage(expense);
     }
     navigate('/expenses');
-  }, [navigate, setEditingIndex]);
+  }, [navigate, setEditingIndex, editingIndex]);
 
   return (
     <div>
