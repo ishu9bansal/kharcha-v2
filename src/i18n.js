@@ -3,8 +3,7 @@ import { initReactI18next } from "react-i18next";
 
 import en from "./locales/en.json";
 
-export function setUpLocales() {
-    i18n
+i18n
     .use(initReactI18next)
     .init({
       resources: {
@@ -16,4 +15,4 @@ export function setUpLocales() {
         escapeValue: false, // React already escapes values
       },
     });
-}
+export default i18n;

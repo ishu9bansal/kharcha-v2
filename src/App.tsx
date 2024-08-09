@@ -6,7 +6,6 @@ import ExpenseFormPage from "./pages/ExpenseFormPage";
 import ExpenseListPage from "./pages/ExpenseListPage";
 import { contentContainerStyle, selectedTabStyle } from "./App.style";
 import { useTranslation } from "react-i18next";
-import { setUpLocales } from "./i18n";
 import { AllTabs, HeaderTab, TabLabel, TabPath } from "./constants/TabConstants";
 
 function App() {
@@ -17,11 +16,7 @@ function App() {
     return AllTabs.findIndex((tab: HeaderTab) => TabPath[tab] === location.pathname);
   }, [location]);
 
-  useEffect(() => {
-    setUpLocales();
-  }, []);
-
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -31,7 +26,7 @@ function App() {
             {AllTabs.map((tab: HeaderTab) => (
               <Tab
                 key={tab}
-                label={tab}
+                label={t(TabLabel[tab])}
                 component={Link}
                 to={TabPath[tab]}
                 sx={selectedTabStyle}
