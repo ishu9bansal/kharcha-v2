@@ -1,5 +1,5 @@
 // src/pages/ExpenseFormPage.tsx
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import ExpenseForm from '../components/ExpenseForm';
 import { addExpenseToLocalStorage, updateExpenseInLocalStorage, getExpensesFromLocalStorage } from '../utils/localStorageHelpers';
 import { Expense } from '../types/Expense';
@@ -20,7 +20,7 @@ const ExpenseFormPage: React.FC = () => {
     }
   }, [location.state]);
 
-  const handleSaveExpense = (expense: Expense) => {
+  const handleSaveExpense = useCallback((expense: Expense) => {
     if (editingIndex !== null) {
       updateExpenseInLocalStorage(editingIndex, expense);
       setEditingIndex(null);
@@ -28,7 +28,7 @@ const ExpenseFormPage: React.FC = () => {
       addExpenseToLocalStorage(expense);
     }
     navigate('/expenses');
-  };
+  }, [navigate, setEditingIndex]);
 
   return (
     <div>

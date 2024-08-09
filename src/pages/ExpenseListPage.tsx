@@ -18,7 +18,7 @@ const ExpenseListPage: React.FC = () => {
     updatedExpenses.splice(index, 1);
     saveExpensesToLocalStorage(updatedExpenses);
     setExpenses(updatedExpenses);
-  }, [expenses]);
+  }, [expenses, setExpenses]);
 
   const handleEditExpense = useCallback((index: number) => {
     navigate('/', { state: { expense: expenses[index], index } });

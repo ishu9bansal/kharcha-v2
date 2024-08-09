@@ -21,7 +21,7 @@ function App() {
     setUpLocales();
   }, []);
 
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
 
   return (
     <>
@@ -31,7 +31,7 @@ function App() {
             {AllTabs.map((tab: HeaderTab) => (
               <Tab
                 key={tab}
-                label={t(TabLabel[tab])}
+                label={tab}
                 component={Link}
                 to={TabPath[tab]}
                 sx={selectedTabStyle}
