@@ -1,7 +1,15 @@
 // src/services/GoogleSheetsService.ts
 import { IExpenseService } from './IExpenseService';
 import { Expense } from '../types/Expense';
-// import { getExpensesFromGoogleSheets, addExpenseToGoogleSheets, updateExpenseInGoogleSheets } from '../utils/googleSheetsHelpers';
+import { SessionManager } from './SessionManager';
+import { UserSheetManager } from './UserSheetManager';
+import {
+  getGoogleSheetsClient,
+  getExpensesFromSheet,
+  addExpenseToSheet,
+  updateExpenseInSheet,
+  deleteExpenseFromSheet,
+} from '../utils/googleSheetsHelper';
 
 export class GoogleSheetsService implements IExpenseService {
   private static instance: GoogleSheetsService;
@@ -15,24 +23,35 @@ export class GoogleSheetsService implements IExpenseService {
     return GoogleSheetsService.instance;
   }
 
-  async getExpenses(): Promise<Expense[]> {
-    console.log('Functionality to be implemented with Google Sheets');
-    return [];
-    // return getExpensesFromGoogleSheets();
+  public async getExpenses(): Promise<Expense[]> {
+    const userId = 'current-user-id'; // This would be dynamically set
+    const accessToken = SessionManager.getInstance().getAccessToken(userId);
+    const spreadsheetId = await UserSheetManager.getInstance().getOrCreateSheetId(userId);
+
+    return getExpensesFromSheet(accessToken!, spreadsheetId);
   }
 
-  async addExpense(expense: Expense): Promise<void> {
-    console.log('Functionality to be implemented with Google Sheets');
-    // await addExpenseToGoogleSheets(expense);
+  public async addExpense(expense: Expense): Promise<void> {
+    const userId = 'current-user-id';
+    const accessToken = SessionManager.getInstance().getAccessToken(userId);
+    const spreadsheetId = await UserSheetManager.getInstance().getOrCreateSheetId(userId);
+
+    return addExpenseToSheet(accessToken!, spreadsheetId, expense);
   }
 
-  async updateExpense(index: number, expense: Expense): Promise<void> {
-    console.log('Functionality to be implemented with Google Sheets');
-    // await updateExpenseInGoogleSheets(index, expense);
+  public async updateExpense(index: number, expense: Expense): Promise<void> {
+    const userId = 'current-user-id';
+    const accessToken = SessionManager.getInstance().getAccessToken(userId);
+    const spreadsheetId = await UserSheetManager.getInstance().getOrCreateSheetId(userId);
+
+    return updateExpenseInSheet(accessToken!, spreadsheetId, index, expense);
   }
 
-  async deleteExpense(index: number): Promise<void> {
-    console.log('Functionality to be implemented with Google Sheets');
-    // Handle deletion by updating the sheet
+  public async deleteExpense(index: number): Promise<void> {
+    const userId = 'current-user-id';
+    const accessToken = SessionManager.getInstance().getAccessToken(userId);
+    const spreadsheetId = await UserSheetManager.getInstance().getOrCreateSheetId(userId);
+
+    return deleteExpenseFromSheet(accessToken!, spreadsheetId, index);
   }
 }
