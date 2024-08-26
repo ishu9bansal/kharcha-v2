@@ -10,7 +10,7 @@ interface ExpenseListPageProps {
   expenseService: IExpenseService;
 }
 
-const ExpenseListPage: React.FC<ExpenseListPageProps> = ({ expenseService }) => {
+export const ExpenseListPage: React.FC<ExpenseListPageProps> = ({ expenseService }) => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const navigate = useNavigate();
 
@@ -30,7 +30,7 @@ const ExpenseListPage: React.FC<ExpenseListPageProps> = ({ expenseService }) => 
   const handleDeleteExpense = useCallback(async (index: number) => {
     await expenseService.deleteExpense(index);
     setExpenses(await expenseService.getExpenses());
-  }, [expenses, expenseService]);
+  }, [expenseService]);
 
   return (
     <div>
@@ -40,5 +40,4 @@ const ExpenseListPage: React.FC<ExpenseListPageProps> = ({ expenseService }) => 
 };
 
 // Use Singleton instance of LocalStorageService by default
-const DefaultExpenseListPage = () => <ExpenseListPage expenseService={LocalStorageService.getInstance()} />;
-export default DefaultExpenseListPage;
+export const LocalExpenseListPage = () => <ExpenseListPage expenseService={LocalStorageService.getInstance()} />;
