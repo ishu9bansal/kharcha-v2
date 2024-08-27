@@ -92,4 +92,11 @@ export default function AppWithRouter() {
  *  Google drive get and create methods are out of scope of the current token
  *  Improve login experience
  *  Masking client id and secret
+ *  local and sheet hybrid
+ * 
+ * Bug fixes:
+ *  access token expiry handling
+ *  expense serialize - deserialize
+ *  create new sheet with the column names
+ *  
  */

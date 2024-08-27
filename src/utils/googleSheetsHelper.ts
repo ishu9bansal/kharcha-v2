@@ -46,7 +46,9 @@ export const getExpensesFromSheet = async (accessToken: string, spreadsheetId: s
     }
   );
 
-  return response.data.values.map((row: string[]) => ({
+  const values = response.data.values || [];
+
+  return values.map((row: string[]) => ({
     date: row[0],
     amount: parseFloat(row[1]),
     title: row[2],
@@ -54,7 +56,7 @@ export const getExpensesFromSheet = async (accessToken: string, spreadsheetId: s
     paymentMode: row[4] as 'Cash' | 'Digital',
     recurring: row[5] === 'TRUE',
     beneficiary: row[6] as 'Self' | 'Family' | 'Friends' | 'Vehicle',
-    tags: row[7].split(','),
+    tags: (row[7] || "").split(','),
   }));
 };
 
