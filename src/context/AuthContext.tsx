@@ -64,6 +64,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     googleAuthUrl = googleAuthUrl.concat(`&client_id=${reactAppClientId}`);
     googleAuthUrl = googleAuthUrl.concat(`&redirect_uri=${redirectUri}`);
     googleAuthUrl = googleAuthUrl.concat(`&scope=${authScope}`);
+    googleAuthUrl = googleAuthUrl.concat(`&code_challenge=${codeChallenge}`);
     googleAuthUrl = googleAuthUrl.concat(`&code_challenge_method=S256`);
     window.location.href = googleAuthUrl;
   };
