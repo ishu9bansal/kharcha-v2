@@ -25,6 +25,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
+    // 3. if 'code' is detected in the query params this part is executed
+    // should we limit this to only look when the path is like /auth/callback ??
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
     const storedCodeVerifier = sessionStorage.getItem('codeVerifier');
@@ -35,6 +37,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const exchangeCodeForToken = async (code: string, codeVerifier: string) => {
+    // 4. this part finally fetches the token to complete the auth 
     try {
       const response = await axios.post('https://oauth2.googleapis.com/token', {
         code,
@@ -55,6 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const login = async () => {
+    // 1. This initiates the request with Google
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = await generateCodeChallenge(codeVerifier);
 
@@ -67,6 +71,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     googleAuthUrl = googleAuthUrl.concat(`&code_challenge=${codeChallenge}`);
     googleAuthUrl = googleAuthUrl.concat(`&code_challenge_method=S256`);
     window.location.href = googleAuthUrl;
+    // 2. Google redirects the user on the redirect uri, with the code in the params
   };
 
   return (
