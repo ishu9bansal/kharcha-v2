@@ -11,6 +11,8 @@ import {
   FormGroup,
   FormControlLabel,
 } from '@mui/material';
+import { Beneficiaries, Beneficiary, Categories, PaymentMode, PaymentModes } from '../types/Expense';
+import { useTranslation } from 'react-i18next';
 
 export const DateInput: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => (
   <TextField
@@ -54,16 +56,18 @@ export const CategoryInput: React.FC<{
   newCategory: string;
   onNewCategoryChange: (value: string) => void;
 }> = ({ selectedCategory, onChange, newCategory, onNewCategoryChange }) => {
-  const categories = [
-    "Entertainment", "Food", "Groceries", "Gift", "Apparel", "Self Care", "Donation", "Capital Expense", "Travel", "Repair", "Medical", "Miscellaneous", "Petrol"
-  ];
+  let categories: string[] = [];
+  categories = categories.concat(Categories);
+  categories = categories.concat(['Extra']);
+
+  const { t } = useTranslation();
 
   return (
     <FormControl component="fieldset" fullWidth>
       <Box border={1} borderColor="grey.500" borderRadius={2} p={2} mt={1}>
         <FormLabel component="legend">Category</FormLabel>
         <Grid container spacing={2} mt={1}>
-          {categories.map((category) => (
+          {categories.map((category: string) => (
             <Grid item xs={6} sm={3} key={category}>
               <ToggleButtonGroup
                 value={selectedCategory}
@@ -72,14 +76,14 @@ export const CategoryInput: React.FC<{
                 fullWidth
               >
                 <ToggleButton value={category} style={{ width: '100%' }}>
-                  {category}
+                  {t(category)}
                 </ToggleButton>
               </ToggleButtonGroup>
             </Grid>
           ))}
         </Grid>
         <TextField
-          label="Add New Category"
+          label={t('add-new-category-label')}
           type="text"
           value={newCategory}
           onChange={(e) => onNewCategoryChange(e.target.value)}
@@ -92,10 +96,13 @@ export const CategoryInput: React.FC<{
 };
 
 export const PaymentModeInput: React.FC<{
-  selectedMode: 'Cash' | 'Digital';
-  onChange: (value: 'Cash' | 'Digital') => void;
-}> = ({ selectedMode, onChange }) => (
-  <FormControl component="fieldset" fullWidth>
+  selectedMode: PaymentMode;
+  onChange: (value: PaymentMode) => void;
+}> = ({ selectedMode, onChange }) => {
+
+  const { t } = useTranslation();
+
+  return <FormControl component="fieldset" fullWidth>
     <Box border={1} borderColor="grey.500" borderRadius={2} p={2} mt={1}>
       <FormLabel component="legend">Payment Mode</FormLabel>
       <ToggleButtonGroup
@@ -104,12 +111,13 @@ export const PaymentModeInput: React.FC<{
         onChange={(e, value) => onChange(value)}
         fullWidth
       >
-        <ToggleButton value="Cash">Cash</ToggleButton>
-        <ToggleButton value="Digital">Digital</ToggleButton>
+        {PaymentModes.map((paymentMode: PaymentMode) => (
+          <ToggleButton value={paymentMode}>{t(paymentMode)}</ToggleButton>
+        ))}
       </ToggleButtonGroup>
     </Box>
   </FormControl>
-);
+};
 
 export const RecurringInput: React.FC<{ value: boolean, onChange: (value: boolean) => void }> = ({ value, onChange }) => (
   <FormGroup>
@@ -128,10 +136,13 @@ export const RecurringInput: React.FC<{ value: boolean, onChange: (value: boolea
 );
 
 export const BeneficiaryInput: React.FC<{
-  selectedBeneficiary: 'Self' | 'Family' | 'Friends' | 'Vehicle';
-  onChange: (value: 'Self' | 'Family' | 'Friends' | 'Vehicle') => void;
-}> = ({ selectedBeneficiary, onChange }) => (
-  <FormControl component="fieldset" fullWidth>
+  selectedBeneficiary: Beneficiary;
+  onChange: (value: Beneficiary) => void;
+}> = ({ selectedBeneficiary, onChange }) => {
+
+  const { t } = useTranslation();
+
+  return <FormControl component="fieldset" fullWidth>
     <Box border={1} borderColor="grey.500" borderRadius={2} p={2} mt={1}>
       <FormLabel component="legend">Beneficiary</FormLabel>
       <ToggleButtonGroup
@@ -140,14 +151,13 @@ export const BeneficiaryInput: React.FC<{
         onChange={(e, value) => onChange(value)}
         fullWidth
       >
-        <ToggleButton value="Self">Self</ToggleButton>
-        <ToggleButton value="Family">Family</ToggleButton>
-        <ToggleButton value="Friends">Friends</ToggleButton>
-        <ToggleButton value="Vehicle">Vehicle</ToggleButton>
+        {Beneficiaries.map((beneficiary: Beneficiary) => (
+          <ToggleButton value={beneficiary}>{t(beneficiary)}</ToggleButton>
+        ))}
       </ToggleButtonGroup>
     </Box>
   </FormControl>
-);
+};
 
 export const TagsInput: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => (
   <TextField

@@ -16,7 +16,7 @@ import {
   BeneficiaryInput,
   TagsInput,
 } from './Inputs';
-import { Expense } from '../types/Expense';
+import { Beneficiary, Expense, PaymentMode } from '../types/Expense';
 import { useTranslation } from 'react-i18next';
 
 interface ExpenseFormProps {
@@ -31,9 +31,9 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSaveExpense, initialData, i
   const [title, setTitle] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [newCategory, setNewCategory] = useState<string>('');
-  const [paymentMode, setPaymentMode] = useState<'Cash' | 'Digital'>('Digital');
+  const [paymentMode, setPaymentMode] = useState<PaymentMode>(PaymentMode.Digital);
   const [recurring, setRecurring] = useState<boolean>(false);
-  const [beneficiary, setBeneficiary] = useState<'Self' | 'Family' | 'Friends' | 'Vehicle'>('Self');
+  const [beneficiary, setBeneficiary] = useState<Beneficiary>(Beneficiary.Self);
   const [tags, setTags] = useState<string>('');
 
   useEffect(() => {
