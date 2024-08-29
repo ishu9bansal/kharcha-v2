@@ -2,8 +2,14 @@
     "add-new-category-label": "Add New Category",
     "button-label-add-expense": "Add Expense",
     "button-label-update-expense": "Update Expense",
+    "recurring-value-yes": "Yes",
+    "recurring-value-no": "No",
     "tab-label-add-expense": "Add Expense",
     "tab-label-view-expenses": "View Expenses",
+    "view-expenses-column-name-actions": "Actions",
+    "view-expense-row-action-edit": "Edit",
+    "view-expense-row-action-delete": "Delete",
+
     "Cash": "Cash",
     "Digital": "Digital",
     "Self": "Self",
@@ -23,5 +29,14 @@
     "Medical": "Medical",
     "Miscellaneous": "Miscellaneous",
     "Petrol": "Petrol",
+    "Date": "Date",
+    "Amount": "Amount",
+    "Title": "Title",
+    "Category": "Category",
+    "Payment Mode": "Payment Mode",
+    "Recurring": "Recurring",
+    "Beneficiary": "Beneficiary",
+    "Tags": "Tags",
+
     "zz-last-entry-for-clean-commits": ""
 }

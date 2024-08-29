@@ -13,10 +13,12 @@ import {
 } from '@mui/material';
 import { Beneficiaries, Beneficiary, Categories, PaymentMode, PaymentModes } from '../types/Expense';
 import { useTranslation } from 'react-i18next';
+import { ExpenseField } from '../types/ExpenseField';
 
-export const DateInput: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => (
-  <TextField
-    label="Date"
+export const DateInput: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => {
+  const { t } = useTranslation();
+  return <TextField
+    label={t(ExpenseField.Date)}
     type="date"
     value={value}
     onChange={(e) => onChange(e.target.value)}
@@ -26,29 +28,31 @@ export const DateInput: React.FC<{ value: string, onChange: (value: string) => v
     }}
     required
   />
-);
+};
 
-export const AmountInput: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => (
-  <TextField
-    label="Amount"
+export const AmountInput: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => {
+  const { t } = useTranslation();
+  return <TextField
+    label={t(ExpenseField.Amount)}
     type="number"
     value={value}
     onChange={(e) => onChange(e.target.value)}
     fullWidth
     required
   />
-);
+};
 
-export const TitleInput: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => (
-  <TextField
-    label="Title"
+export const TitleInput: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => {
+  const { t } = useTranslation();
+  return <TextField
+    label={t(ExpenseField.Title)}
     type="text"
     value={value}
     onChange={(e) => onChange(e.target.value)}
     fullWidth
     required
   />
-);
+};
 
 export const CategoryInput: React.FC<{
   selectedCategory: string;
@@ -56,16 +60,16 @@ export const CategoryInput: React.FC<{
   newCategory: string;
   onNewCategoryChange: (value: string) => void;
 }> = ({ selectedCategory, onChange, newCategory, onNewCategoryChange }) => {
+  const { t } = useTranslation();
+
   let categories: string[] = [];
   categories = categories.concat(Categories);
   categories = categories.concat(['Extra']);
 
-  const { t } = useTranslation();
-
   return (
     <FormControl component="fieldset" fullWidth>
       <Box border={1} borderColor="grey.500" borderRadius={2} p={2} mt={1}>
-        <FormLabel component="legend">Category</FormLabel>
+        <FormLabel component="legend">{t(ExpenseField.Category)}</FormLabel>
         <Grid container spacing={2} mt={1}>
           {categories.map((category: string) => (
             <Grid item xs={6} sm={3} key={category}>
@@ -99,16 +103,14 @@ export const PaymentModeInput: React.FC<{
   selectedMode: PaymentMode;
   onChange: (value: PaymentMode) => void;
 }> = ({ selectedMode, onChange }) => {
-
   const { t } = useTranslation();
-
   return <FormControl component="fieldset" fullWidth>
     <Box border={1} borderColor="grey.500" borderRadius={2} p={2} mt={1}>
-      <FormLabel component="legend">Payment Mode</FormLabel>
+      <FormLabel component="legend">{t(ExpenseField.PaymentMode)}</FormLabel>
       <ToggleButtonGroup
         value={selectedMode}
         exclusive
-        onChange={(e, value) => onChange(value)}
+        onChange={(e, value) => value && onChange(value)}
         fullWidth
       >
         {PaymentModes.map((paymentMode: PaymentMode) => (
@@ -119,8 +121,9 @@ export const PaymentModeInput: React.FC<{
   </FormControl>
 };
 
-export const RecurringInput: React.FC<{ value: boolean, onChange: (value: boolean) => void }> = ({ value, onChange }) => (
-  <FormGroup>
+export const RecurringInput: React.FC<{ value: boolean, onChange: (value: boolean) => void }> = ({ value, onChange }) => {
+  const { t } = useTranslation();
+  return <FormGroup>
     <Box border={1} borderColor="grey.500" borderRadius={2} p={2} mt={1}>
       <FormControlLabel
         control={
@@ -129,11 +132,11 @@ export const RecurringInput: React.FC<{ value: boolean, onChange: (value: boolea
             onChange={() => onChange(!value)}
           />
         }
-        label="Recurring"
+        label={t(ExpenseField.Recurring)}
       />
     </Box>
   </FormGroup>
-);
+};
 
 export const BeneficiaryInput: React.FC<{
   selectedBeneficiary: Beneficiary;
@@ -144,11 +147,11 @@ export const BeneficiaryInput: React.FC<{
 
   return <FormControl component="fieldset" fullWidth>
     <Box border={1} borderColor="grey.500" borderRadius={2} p={2} mt={1}>
-      <FormLabel component="legend">Beneficiary</FormLabel>
+      <FormLabel component="legend">{t(ExpenseField.Beneficiary)}</FormLabel>
       <ToggleButtonGroup
         value={selectedBeneficiary}
         exclusive
-        onChange={(e, value) => onChange(value)}
+        onChange={(e, value) => value && onChange(value)}
         fullWidth
       >
         {Beneficiaries.map((beneficiary: Beneficiary) => (
@@ -159,12 +162,13 @@ export const BeneficiaryInput: React.FC<{
   </FormControl>
 };
 
-export const TagsInput: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => (
-  <TextField
-    label="Tags"
+export const TagsInput: React.FC<{ value: string, onChange: (value: string) => void }> = ({ value, onChange }) => {
+  const { t } = useTranslation();
+  return <TextField
+    label={t(ExpenseField.Tags)}
     type="text"
     value={value}
     onChange={(e) => onChange(e.target.value)}
     fullWidth
   />
-);
+};

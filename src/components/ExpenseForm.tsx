@@ -39,7 +39,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSaveExpense, initialData, i
   useEffect(() => {
     if (initialData) {
       setDate(initialData.date);
-      setAmount(initialData.amount>0 ? initialData.amount.toString() : '');
+      setAmount(initialData.amount.toString());
       setTitle(initialData.title);
       setCategory(initialData.category);
       setPaymentMode(initialData.paymentMode);
