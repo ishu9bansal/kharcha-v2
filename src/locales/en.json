@@ -1,4 +1,7 @@
 {
+    "button-label-add-expense": "Add Expense",
+    "button-label-update-expense": "Update Expense",
     "tab-label-add-expense": "Add Expense",
-    "tab-label-view-expenses": "View Expenses"
+    "tab-label-view-expenses": "View Expenses",
+    "zz-last-entry-for-clean-commits": ""
 }
