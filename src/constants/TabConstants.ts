@@ -1,11 +1,13 @@
+import { RelativeAddExpense, RelativeViewExpenses } from "./UrlConstants";
+
 export enum HeaderTab {
     AddExpense,
     ViewExpenses,
 }
 
 export const TabPath: Record<HeaderTab, string> = {
-    [HeaderTab.AddExpense]: "/",
-    [HeaderTab.ViewExpenses]: "/expenses",
+    [HeaderTab.AddExpense]: RelativeAddExpense,
+    [HeaderTab.ViewExpenses]: RelativeViewExpenses,
 }
 
 export const TabLabel: Record<HeaderTab, string> = {
