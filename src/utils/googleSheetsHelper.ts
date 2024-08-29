@@ -1,94 +1,143 @@
 // src/utils/googleSheetsHelper.ts
-import { google, sheets_v4 } from 'googleapis';
+import axios from 'axios';
 import { Expense } from '../types/Expense';
 
-export function getGoogleSheetsClient(accessToken: string): sheets_v4.Sheets {
-  const oauth2Client = new google.auth.OAuth2();
-  oauth2Client.setCredentials({ access_token: accessToken });
-  return google.sheets({ version: 'v4', auth: oauth2Client });
-}
+const sheetName = 'KharchaApp/ExpensesSheet';
 
-export async function createNewSpreadsheet(accessToken: string): Promise<string> {
-  const sheets = getGoogleSheetsClient(accessToken);
-  const response = await sheets.spreadsheets.create({
-    requestBody: {
-      properties: {
-        title: 'User Expenses',
+export const getGoogleSheetsClient = (accessToken: string) => ({
+  getOrCreateSheet: async (): Promise<string> => {
+    const response = await axios.get('https://www.googleapis.com/drive/v3/files', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
       },
-    },
-  });
-  return response.data.spreadsheetId!;
-}
+      params: {
+        q: `name='${sheetName}' and mimeType='application/vnd.google-apps.spreadsheet'`,
+      },
+    });
 
-export async function getExpensesFromSheet(accessToken: string, spreadsheetId: string): Promise<Expense[]> {
-  const sheets = getGoogleSheetsClient(accessToken);
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: `Sheet1!A2:H`,
-  });
+    if (response.data.files.length === 0) {
+      const createResponse = await axios.post(
+        'https://sheets.googleapis.com/v4/spreadsheets',
+        {
+          properties: { title: sheetName },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
-  return response.data.values?.map(row => ({
+      return createResponse.data.spreadsheetId;
+    } else {
+      return response.data.files[0].id;
+    }
+  },
+});
+
+export const getExpensesFromSheet = async (accessToken: string, spreadsheetId: string): Promise<Expense[]> => {
+  const response = await axios.get(
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  const values = response.data.values || [];
+
+  return values.map((row: string[]) => ({
     date: row[0],
-    amount: Number(row[1]),
+    amount: parseFloat(row[1]),
     title: row[2],
     category: row[3],
-    paymentMode: row[4],
+    paymentMode: row[4] as 'Cash' | 'Digital',
     recurring: row[5] === 'TRUE',
-    beneficiary: row[6],
-    tags: row[7] ? row[7].split(',') : [],
-  })) || [];
-}
+    beneficiary: row[6] as 'Self' | 'Family' | 'Friends' | 'Vehicle',
+    tags: (row[7] || "").split(','),
+  }));
+};
 
-export async function addExpenseToSheet(accessToken: string, spreadsheetId: string, expense: Expense): Promise<void> {
-  const sheets = getGoogleSheetsClient(accessToken);
-  await sheets.spreadsheets.values.append({
-    spreadsheetId,
-    range: `Sheet1!A:H`,
-    valueInputOption: 'RAW',
-    requestBody: {
-      values: [
-        [
-          expense.date,
-          expense.amount,
-          expense.title,
-          expense.category,
-          expense.paymentMode,
-          expense.recurring ? 'TRUE' : 'FALSE',
-          expense.beneficiary,
-          expense.tags.join(','),
-        ],
+export const addExpenseToSheet = async (accessToken: string, spreadsheetId: string, expense: Expense): Promise<void> => {
+  await axios.post(
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1:append`,
+    {
+      range: 'Sheet1',
+      values: [[
+        expense.date,
+        expense.amount,
+        expense.title,
+        expense.category,
+        expense.paymentMode,
+        expense.recurring ? 'TRUE' : 'FALSE',
+        expense.beneficiary,
+        expense.tags.join(',')
+      ]],
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      params: {
+        valueInputOption: 'RAW',
+      },
+    }
+  );
+};
+
+export const updateExpenseInSheet = async (accessToken: string, spreadsheetId: string, index: number, expense: Expense): Promise<void> => {
+  await axios.put(
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A${index + 1}`,
+    {
+      range: `Sheet1!A${index + 1}`,
+      values: [[
+        expense.date,
+        expense.amount,
+        expense.title,
+        expense.category,
+        expense.paymentMode,
+        expense.recurring ? 'TRUE' : 'FALSE',
+        expense.beneficiary,
+        expense.tags.join(',')
+      ]],
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      params: {
+        valueInputOption: 'RAW',
+      },
+    }
+  );
+};
+
+export const deleteExpenseFromSheet = async (accessToken: string, spreadsheetId: string, index: number): Promise<void> => {
+  await axios.post(
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`,
+    {
+      requests: [
+        {
+          deleteRange: {
+            range: {
+              sheetId: 0, // Assuming Sheet1 is the first sheet
+              startRowIndex: index,
+              endRowIndex: index + 1,
+            },
+            shiftDimension: 'ROWS',
+          },
+        },
       ],
     },
-  });
-}
-
-export async function updateExpenseInSheet(accessToken: string, spreadsheetId: string, row: number, expense: Expense): Promise<void> {
-  const sheets = getGoogleSheetsClient(accessToken);
-  await sheets.spreadsheets.values.update({
-    spreadsheetId,
-    range: `Sheet1!A${row + 2}:H${row + 2}`,
-    valueInputOption: 'RAW',
-    requestBody: {
-      values: [
-        [
-          expense.date,
-          expense.amount,
-          expense.title,
-          expense.category,
-          expense.paymentMode,
-          expense.recurring ? 'TRUE' : 'FALSE',
-          expense.beneficiary,
-          expense.tags.join(','),
-        ],
-      ],
-    },
-  });
-}
-
-export async function deleteExpenseFromSheet(accessToken: string, spreadsheetId: string, row: number): Promise<void> {
-  const sheets = getGoogleSheetsClient(accessToken);
-  await sheets.spreadsheets.values.clear({
-    spreadsheetId,
-    range: `Sheet1!A${row + 2}:H${row + 2}`,
-  });
-}
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+};

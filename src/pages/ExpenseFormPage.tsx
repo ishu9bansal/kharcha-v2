@@ -10,7 +10,7 @@ interface ExpenseFormPageProps {
   expenseService: IExpenseService;
 }
 
-const ExpenseFormPage: React.FC<ExpenseFormPageProps> = ({ expenseService }) => {
+export const ExpenseFormPage: React.FC<ExpenseFormPageProps> = ({ expenseService }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [initialExpenseData, setInitialExpenseData] = useState<Expense | null>(null);
   const location = useLocation();
@@ -42,5 +42,4 @@ const ExpenseFormPage: React.FC<ExpenseFormPageProps> = ({ expenseService }) => 
 };
 
 // Use Singleton instance of LocalStorageService by default
-const DefaultExpenseFormPage = () => <ExpenseFormPage expenseService={LocalStorageService.getInstance()} />;
-export default DefaultExpenseFormPage;
+export const LocalExpenseFormPage = () => <ExpenseFormPage expenseService={LocalStorageService.getInstance()} />;
