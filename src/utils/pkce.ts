@@ -15,3 +15,5 @@ export const generateCodeChallenge = async (codeVerifier: string): Promise<strin
         .replace(/=+$/, '');
     return base64Digest;
 };
+
+export const pkceEnabled = process.env.REACT_APP_ENABLE_PKCE === 'true';

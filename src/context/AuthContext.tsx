@@ -1,6 +1,6 @@
 // src/context/AuthContext.tsx
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
-import { generateCodeVerifier, generateCodeChallenge } from '../utils/pkce';
+import { generateCodeVerifier, generateCodeChallenge, pkceEnabled } from '../utils/pkce';
 import axios from 'axios';
 
 interface AuthContextProps {
@@ -15,8 +15,10 @@ const AuthContext = createContext<AuthContextProps>({
   login: () => {},
 });
 
-const reactAppClientId = process.env.REACT_APP_CLIENT_ID;
-const reactAppClientSecret = process.env.REACT_APP_CLIENT_SECRET;
+const reactAppClientId = pkceEnabled ? process.env.REACT_APP_CLIENT_ID : undefined;
+const reactAppClientSecret = pkceEnabled ? process.env.REACT_APP_CLIENT_SECRET : undefined;
+const redirectUri = 'http://localhost:3000/kharcha-v2/auth/callback';
+const authScope = 'https://www.googleapis.com/auth/drive.file%20profile%20email';
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -38,7 +40,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         code,
         client_id: reactAppClientId,
         client_secret: reactAppClientSecret,
-        redirect_uri: 'http://localhost:3000/auth/callback',
+        redirect_uri: redirectUri,
         grant_type: 'authorization_code',
         code_verifier: codeVerifier,
       });
@@ -58,8 +60,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     sessionStorage.setItem('codeVerifier', codeVerifier);
 
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${reactAppClientId}&redirect_uri=http://localhost:3000/auth/callback&scope=https://www.googleapis.com/auth/drive.file%20profile%20email&code_challenge=${codeChallenge}&code_challenge_method=S256`;
-
+    let googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code`;
+    googleAuthUrl = googleAuthUrl.concat(`&client_id=${reactAppClientId}`);
+    googleAuthUrl = googleAuthUrl.concat(`&redirect_uri=${redirectUri}`);
+    googleAuthUrl = googleAuthUrl.concat(`&scope=${authScope}`);
+    googleAuthUrl = googleAuthUrl.concat(`&code_challenge_method=S256`);
     window.location.href = googleAuthUrl;
   };
 

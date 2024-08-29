@@ -10,16 +10,26 @@ import { AllTabs, HeaderTab, TabLabel, TabPath } from "./constants/TabConstants"
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { GoogleSheetsService } from "./services/GoogleSheetsService";
 import { IExpenseService } from "./services/IExpenseService";
+import { pkceEnabled } from "./utils/pkce";
+import { LocalStorageService } from "./services/LocalStorageService";
 
 function App() {
   const location = useLocation();
   const [ expenseService, setExpenseService ] = useState<IExpenseService | null>(null);
   const { accessToken, isAuthenticated, login } = useAuth();
   
-  useEffect(() => {
-    if (isAuthenticated && accessToken) {
-      setExpenseService(GoogleSheetsService.getInstance(accessToken));
+  const expenseServiceInstantiator = (pkceEnabled: boolean, isAuthenticated: boolean, accessToken: string | null): IExpenseService | null => {
+    if (!pkceEnabled) {
+      return LocalStorageService.getInstance();
     }
+    if (isAuthenticated && accessToken) {
+      return GoogleSheetsService.getInstance(accessToken);
+    }
+    return null;
+  }
+
+  useEffect(() => {
+    setExpenseService(expenseServiceInstantiator(pkceEnabled, isAuthenticated, accessToken));
   }, [setExpenseService, isAuthenticated, accessToken]);
 
   const getActiveTab = useCallback(() => {
@@ -61,7 +71,7 @@ function App() {
 
 export default function AppWithRouter() {
   return (
-    <Router>
+    <Router basename="/kharcha-v2">
       <AuthProvider>
         <App />
       </AuthProvider>

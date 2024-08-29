@@ -1,7 +1,6 @@
 // src/services/GoogleSheetsService.ts
 import { IExpenseService } from './IExpenseService';
 import { Expense } from '../types/Expense';
-import { useAuth } from '../context/AuthContext';
 import {
   getGoogleSheetsClient,
   getExpensesFromSheet,
