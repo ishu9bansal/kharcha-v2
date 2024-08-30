@@ -77,7 +77,7 @@ export const getExpensesFromSheet = async (accessToken: string, spreadsheetId: s
 
   const values = response.data.values || [];
 
-  return values.map((row: string[]) => ({
+  return values.splice(1).map((row: string[]) => ({
     date: row[0],
     amount: parseFloat(row[1]),
     title: row[2],
