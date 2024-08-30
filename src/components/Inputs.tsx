@@ -114,7 +114,7 @@ export const PaymentModeInput: React.FC<{
         fullWidth
       >
         {PaymentModes.map((paymentMode: PaymentMode) => (
-          <ToggleButton value={paymentMode}>{t(paymentMode)}</ToggleButton>
+          <ToggleButton value={paymentMode} key={paymentMode}>{t(paymentMode)}</ToggleButton>
         ))}
       </ToggleButtonGroup>
     </Box>
@@ -155,7 +155,7 @@ export const BeneficiaryInput: React.FC<{
         fullWidth
       >
         {Beneficiaries.map((beneficiary: Beneficiary) => (
-          <ToggleButton value={beneficiary}>{t(beneficiary)}</ToggleButton>
+          <ToggleButton value={beneficiary} key={beneficiary}>{t(beneficiary)}</ToggleButton>
         ))}
       </ToggleButtonGroup>
     </Box>

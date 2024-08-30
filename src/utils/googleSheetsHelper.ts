@@ -1,6 +1,7 @@
 // src/utils/googleSheetsHelper.ts
 import axios from 'axios';
 import { Expense } from '../types/Expense';
+import { ExpenseField } from '../types/ExpenseField';
 
 const sheetName = 'KharchaApp/ExpensesSheet';
 
@@ -29,7 +30,35 @@ export const getGoogleSheetsClient = (accessToken: string) => ({
         }
       );
 
-      return createResponse.data.spreadsheetId;
+      const spreadsheetId = createResponse.data.spreadsheetId;
+
+      await axios.post(
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1:append`,
+        {
+          range: 'Sheet1',
+          values: [[
+            ExpenseField.Date,
+            ExpenseField.Amount,
+            ExpenseField.Title,
+            ExpenseField.Category,
+            ExpenseField.PaymentMode,
+            ExpenseField.Recurring,
+            ExpenseField.Beneficiary,
+            ExpenseField.Tags
+          ]],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          params: {
+            valueInputOption: 'RAW',
+          },
+        }
+      );
+
+      return spreadsheetId;
     } else {
       return response.data.files[0].id;
     }
@@ -90,9 +119,9 @@ export const addExpenseToSheet = async (accessToken: string, spreadsheetId: stri
 
 export const updateExpenseInSheet = async (accessToken: string, spreadsheetId: string, index: number, expense: Expense): Promise<void> => {
   await axios.put(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A${index + 1}`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A${index + 2}`,
     {
-      range: `Sheet1!A${index + 1}`,
+      range: `Sheet1!A${index + 2}`,
       values: [[
         expense.date,
         expense.amount,
@@ -125,8 +154,8 @@ export const deleteExpenseFromSheet = async (accessToken: string, spreadsheetId:
           deleteRange: {
             range: {
               sheetId: 0, // Assuming Sheet1 is the first sheet
-              startRowIndex: index,
-              endRowIndex: index + 1,
+              startRowIndex: index + 1,
+              endRowIndex: index + 2,
             },
             shiftDimension: 'ROWS',
           },
