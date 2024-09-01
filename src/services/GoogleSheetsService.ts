@@ -1,78 +1,47 @@
 // src/services/GoogleSheetsService.ts
 import { IExpenseService } from './IExpenseService';
 import { Expense } from '../types/Expense';
-import {
-  getGoogleSheetsClient,
-  getExpensesFromSheet,
-  addExpenseToSheet,
-  updateExpenseInSheet,
-  deleteExpenseFromSheet,
-} from '../utils/googleSheetsHelper';
+import { GoogleSheetsClient } from './GoogleSheetsClient';
 
 export class GoogleSheetsService implements IExpenseService {
   private static instance: GoogleSheetsService;
-  private accessToken: string | null;
+  private client: GoogleSheetsClient;
   private constructor() {
-    this.accessToken = null;
+    this.client = new GoogleSheetsClient();
   }
 
-  public static getInstance(accessToken: string): GoogleSheetsService {
+  public static async getInstance(accessToken: string): Promise<GoogleSheetsService> {
     if (!GoogleSheetsService.instance) {
       GoogleSheetsService.instance = new GoogleSheetsService();
     }
-    GoogleSheetsService.instance.setAccessToken(accessToken);
+    await GoogleSheetsService.instance.setAccessToken(accessToken);
     return GoogleSheetsService.instance;
   }
 
-  public setAccessToken(accessToken: string) {
-    this.accessToken = accessToken;
-  }
-
-  private getAccessToken(): string | null {
-    return this.accessToken;
+  public async setAccessToken(accessToken: string) {
+    await this.client.initSetupWithAccessToken(accessToken);
   }
 
   public async getExpenses(): Promise<Expense[]> {
-    const accessToken = this.getAccessToken();
-    if (!accessToken) {
-      throw new Error('No access token available');
-    }
-    const spreadsheetId = await this.getOrCreateSheet();
-    return getExpensesFromSheet(accessToken, spreadsheetId);
+    const values = await this.client.getDataFromSheet();
+    return values.splice(1).map(this.client.deserialize); // First row is the column names
   }
 
   public async addExpense(expense: Expense): Promise<void> {
-    const accessToken = this.getAccessToken();
-    if (!accessToken) {
-      throw new Error('No access token available');
-    }
-    const spreadsheetId = await this.getOrCreateSheet();
-    return addExpenseToSheet(accessToken, spreadsheetId, expense);
+    const row = this.client.serialize(expense);
+    await this.client.appendRowsToSpreadsheet([row]);
   }
 
   public async updateExpense(index: number, expense: Expense): Promise<void> {
-    const accessToken = this.getAccessToken();
-    if (!accessToken) {
-      throw new Error('No access token available');
-    }
-    const spreadsheetId = await this.getOrCreateSheet();
-    return updateExpenseInSheet(accessToken, spreadsheetId, index, expense);
+    const row = this.client.serialize(expense);
+    await this.client.updateRowInSpreadsheet(index+2, row);
+    // +1 for index is 0 based while sheets are 1 based 
+    // +1 for first row being the column names
   }
 
   public async deleteExpense(index: number): Promise<void> {
-    const accessToken = this.getAccessToken();
-    if (!accessToken) {
-      throw new Error('No access token available');
-    }
-    const spreadsheetId = await this.getOrCreateSheet();
-    return deleteExpenseFromSheet(accessToken, spreadsheetId, index);
-  }
-
-  private async getOrCreateSheet(): Promise<string> {
-    const accessToken = this.getAccessToken();
-    if (!accessToken) {
-      throw new Error('No access token available');
-    }
-    return await getGoogleSheetsClient(accessToken).getOrCreateSheet();
+    await this.client.deleteRowsFromSpreadsheet(index+1, 1);
+    // Assuming Sheet1 is the first sheet hence pageIndex 0
+    // index+1 for column names
   }
 }

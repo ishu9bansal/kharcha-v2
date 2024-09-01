@@ -18,18 +18,18 @@ function App() {
   const [ expenseService, setExpenseService ] = useState<IExpenseService | null>(null);
   const { accessToken, isAuthenticated, login } = useAuth();
   
-  const expenseServiceInstantiator = (pkceEnabled: boolean, isAuthenticated: boolean, accessToken: string | null): IExpenseService | null => {
+  const expenseServiceInstantiator = async (pkceEnabled: boolean, isAuthenticated: boolean, accessToken: string | null): Promise<IExpenseService | null> => {
     if (!pkceEnabled) {
       return LocalStorageService.getInstance();
     }
     if (isAuthenticated && accessToken) {
-      return GoogleSheetsService.getInstance(accessToken);
+      return await GoogleSheetsService.getInstance(accessToken);
     }
     return null;
   }
 
   useEffect(() => {
-    setExpenseService(expenseServiceInstantiator(pkceEnabled, isAuthenticated, accessToken));
+    expenseServiceInstantiator(pkceEnabled, isAuthenticated, accessToken).then(setExpenseService);
   }, [setExpenseService, isAuthenticated, accessToken]);
 
   const getActiveTab = useCallback(() => {
