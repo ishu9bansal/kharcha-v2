@@ -1,7 +1,7 @@
 // src/services/GoogleSheetsService.ts
 import { IExpenseService } from './IExpenseService';
 import { Expense } from '../types/Expense';
-import { GoogleSheetsClient } from './GoogleSheetsClient';
+import { GoogleSheetsClient } from '../clients/GoogleSheetsClient';
 
 export class GoogleSheetsService implements IExpenseService {
   private static instance: GoogleSheetsService;
