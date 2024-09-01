@@ -25,7 +25,5 @@ export const getExpensesFromLocalStorage = (): Expense[] => {
 /**
  * TODO:
  *  - Unify these helpers as these have a common pattern
- *  - Google Sheets helper clean up
- *  - Google Sheets add new sheet with column names
- *  - Aim to create a hybric service by using the unification
+ *  - Aim to create a hybrid service by using the unification
  */
