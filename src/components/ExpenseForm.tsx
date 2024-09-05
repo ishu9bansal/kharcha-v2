@@ -16,22 +16,24 @@ import {
   BeneficiaryInput,
   TagsInput,
 } from './Inputs';
-import { Expense } from '../types/Expense';
+import { Beneficiary, Expense, PaymentMode } from '../types/Expense';
+import { useTranslation } from 'react-i18next';
 
 interface ExpenseFormProps {
   onSaveExpense: (expense: Expense) => void;
-  initialData?: Expense | null;
+  initialData: Expense | null;
+  isEditForm: boolean;
 }
 
-const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSaveExpense, initialData }) => {
+const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSaveExpense, initialData, isEditForm }) => {
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [amount, setAmount] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [category, setCategory] = useState<string>('');
   const [newCategory, setNewCategory] = useState<string>('');
-  const [paymentMode, setPaymentMode] = useState<'Cash' | 'Digital'>('Digital');
+  const [paymentMode, setPaymentMode] = useState<PaymentMode>(PaymentMode.Digital);
   const [recurring, setRecurring] = useState<boolean>(false);
-  const [beneficiary, setBeneficiary] = useState<'Self' | 'Family' | 'Friends' | 'Vehicle'>('Self');
+  const [beneficiary, setBeneficiary] = useState<Beneficiary>(Beneficiary.Self);
   const [tags, setTags] = useState<string>('');
 
   useEffect(() => {
@@ -52,6 +54,8 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSaveExpense, initialData })
     const finalCategory = category || newCategory;
     onSaveExpense({ date, amount: +amount, title, category: finalCategory, paymentMode, recurring, beneficiary, tags: tags.split(',') });
   };
+
+  const { t } = useTranslation();
 
   return (
     <Container maxWidth="md">
@@ -85,7 +89,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSaveExpense, initialData })
             <Button type="submit" variant="contained" color="primary" fullWidth sx={{
               margin: '0 0 20px 0',
             }}>
-              {initialData ? 'Update Expense' : 'Add Expense'}
+              { t(isEditForm ? 'button-label-update-expense' : 'button-label-add-expense') }
             </Button>
           </Grid>
         </Grid>

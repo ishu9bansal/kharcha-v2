@@ -4,7 +4,8 @@ import ExpenseList from '../components/ExpenseList';
 import { IExpenseService } from '../services/IExpenseService';
 import { LocalStorageService } from '../services/LocalStorageService';
 import { useNavigate } from 'react-router-dom';
-import { Expense } from '../types/Expense';
+import { Expense, LocationState } from '../types/Expense';
+import { HeaderTab, TabPath } from '../constants/TabConstants';
 
 interface ExpenseListPageProps {
   expenseService: IExpenseService;
@@ -24,7 +25,8 @@ export const ExpenseListPage: React.FC<ExpenseListPageProps> = ({ expenseService
   }, [expenseService]);
 
   const handleEditExpense = useCallback((index: number) => {
-    navigate('/', { state: { expense: expenses[index], index } });
+    const state: LocationState = { expense: expenses[index], index };
+    navigate(TabPath[HeaderTab.AddExpense], { state });
   }, [navigate, expenses]);
 
   const handleDeleteExpense = useCallback(async (index: number) => {

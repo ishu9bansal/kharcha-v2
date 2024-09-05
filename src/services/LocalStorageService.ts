@@ -1,12 +1,16 @@
 // src/services/LocalStorageService.ts
 import { IExpenseService } from './IExpenseService';
 import { Expense } from '../types/Expense';
-import { getExpensesFromLocalStorage, saveExpensesToLocalStorage } from '../utils/localStorageHelpers';
+import { LocalStorageClient } from '../clients/LocalStorageClient';
 
 export class LocalStorageService implements IExpenseService {
   private static instance: LocalStorageService;
 
-  private constructor() {}
+  private client: LocalStorageClient;
+
+  private constructor() {
+    this.client = new LocalStorageClient(localStorage);
+  }
 
   public static getInstance(): LocalStorageService {
     if (!LocalStorageService.instance) {
@@ -16,24 +20,24 @@ export class LocalStorageService implements IExpenseService {
   }
 
   async getExpenses(): Promise<Expense[]> {
-    return getExpensesFromLocalStorage();
+    return this.client.getExpensesFromLocalStorage();
   }
 
   async addExpense(expense: Expense): Promise<void> {
     const expenses = await this.getExpenses();
     expenses.push(expense);
-    saveExpensesToLocalStorage(expenses);
+    this.client.saveExpensesToLocalStorage(expenses);
   }
 
   async updateExpense(index: number, expense: Expense): Promise<void> {
     const expenses = await this.getExpenses();
     expenses[index] = expense;
-    saveExpensesToLocalStorage(expenses);
+    this.client.saveExpensesToLocalStorage(expenses);
   }
 
   async deleteExpense(index: number): Promise<void> {
     const expenses = await this.getExpenses();
     expenses.splice(index, 1);
-    saveExpensesToLocalStorage(expenses);
+    this.client.saveExpensesToLocalStorage(expenses);
   }
 }

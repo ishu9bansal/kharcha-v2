@@ -2,6 +2,7 @@
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import { generateCodeVerifier, generateCodeChallenge, pkceEnabled } from '../utils/pkce';
 import axios from 'axios';
+import { AuthScope, BaseUrl, CallbackUrl, CodeChallengeMethodS256, GoogleAuthUrl, GoogleTokenUrl, GrantTypeAuthorizationCode, KeyCodeVerifier, QueryParamClientId, QueryParamCode, QueryParamCodeChallenge, QueryParamCodeChallengeMethod, QueryParamRedirectUri, QueryParamResponseType, QueryParamScope, ResponseTypeCode } from '../constants/UrlConstants';
 
 interface AuthContextProps {
   accessToken: string | null;
@@ -17,8 +18,7 @@ const AuthContext = createContext<AuthContextProps>({
 
 const reactAppClientId = pkceEnabled ? process.env.REACT_APP_CLIENT_ID : undefined;
 const reactAppClientSecret = pkceEnabled ? process.env.REACT_APP_CLIENT_SECRET : undefined;
-const redirectUri = 'http://localhost:3000/kharcha-v2/auth/callback';
-const authScope = 'https://www.googleapis.com/auth/drive.file%20profile%20email';
+const redirectUri = `${process.env.REACT_APP_HOST_URL}${BaseUrl}${CallbackUrl}`;
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -28,8 +28,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // 3. if 'code' is detected in the query params this part is executed
     // should we limit this to only look when the path is like /auth/callback ??
     const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
-    const storedCodeVerifier = sessionStorage.getItem('codeVerifier');
+    const code = params.get(QueryParamCode);
+    const storedCodeVerifier = sessionStorage.getItem(KeyCodeVerifier);
 
     if (code && storedCodeVerifier) {
       exchangeCodeForToken(code, storedCodeVerifier);
@@ -39,18 +39,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const exchangeCodeForToken = async (code: string, codeVerifier: string) => {
     // 4. this part finally fetches the token to complete the auth 
     try {
-      const response = await axios.post('https://oauth2.googleapis.com/token', {
+      const response = await axios.post(GoogleTokenUrl, {
         code,
         client_id: reactAppClientId,
         client_secret: reactAppClientSecret,
         redirect_uri: redirectUri,
-        grant_type: 'authorization_code',
+        grant_type: GrantTypeAuthorizationCode,
         code_verifier: codeVerifier,
       });
 
       setAccessToken(response.data.access_token);
       setIsAuthenticated(true);
-      sessionStorage.removeItem('codeVerifier');
+      sessionStorage.removeItem(KeyCodeVerifier);
       window.history.replaceState({}, document.title, "/");
     } catch (error) {
       console.error('Error exchanging code for token', error);
@@ -62,14 +62,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = await generateCodeChallenge(codeVerifier);
 
-    sessionStorage.setItem('codeVerifier', codeVerifier);
+    sessionStorage.setItem(KeyCodeVerifier, codeVerifier);
 
-    let googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code`;
-    googleAuthUrl = googleAuthUrl.concat(`&client_id=${reactAppClientId}`);
-    googleAuthUrl = googleAuthUrl.concat(`&redirect_uri=${redirectUri}`);
-    googleAuthUrl = googleAuthUrl.concat(`&scope=${authScope}`);
-    googleAuthUrl = googleAuthUrl.concat(`&code_challenge=${codeChallenge}`);
-    googleAuthUrl = googleAuthUrl.concat(`&code_challenge_method=S256`);
+    let googleAuthUrl = `${GoogleAuthUrl}?${QueryParamResponseType}=${ResponseTypeCode}`;
+    googleAuthUrl = googleAuthUrl.concat(`&${QueryParamClientId}=${reactAppClientId}`);
+    googleAuthUrl = googleAuthUrl.concat(`&${QueryParamRedirectUri}=${redirectUri}`);
+    googleAuthUrl = googleAuthUrl.concat(`&${QueryParamScope}=${AuthScope}`);
+    googleAuthUrl = googleAuthUrl.concat(`&${QueryParamCodeChallenge}=${codeChallenge}`);
+    googleAuthUrl = googleAuthUrl.concat(`&${QueryParamCodeChallengeMethod}=${CodeChallengeMethodS256}`);
     window.location.href = googleAuthUrl;
     // 2. Google redirects the user on the redirect uri, with the code in the params
   };

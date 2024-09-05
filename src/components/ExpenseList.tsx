@@ -12,6 +12,8 @@ import {
   Button,
   Container,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { ExpenseField } from '../types/ExpenseField';
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -20,21 +22,22 @@ interface ExpenseListProps {
 }
 
 const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onDeleteExpense, onEditExpense }) => {
+  const { t } = useTranslation();
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Date</TableCell>
-              <TableCell>Amount</TableCell>
-              <TableCell>Title</TableCell>
-              <TableCell>Category</TableCell>
-              <TableCell>Payment Mode</TableCell>
-              <TableCell>Recurring</TableCell>
-              <TableCell>Beneficiary</TableCell>
-              <TableCell>Tags</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell>{t(ExpenseField.Date)}</TableCell>
+              <TableCell>{t(ExpenseField.Amount)}</TableCell>
+              <TableCell>{t(ExpenseField.Title)}</TableCell>
+              <TableCell>{t(ExpenseField.Category)}</TableCell>
+              <TableCell>{t(ExpenseField.PaymentMode)}</TableCell>
+              <TableCell>{t(ExpenseField.Recurring)}</TableCell>
+              <TableCell>{t(ExpenseField.Beneficiary)}</TableCell>
+              <TableCell>{t(ExpenseField.Tags)}</TableCell>
+              <TableCell>{t("view-expenses-column-name-actions")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -45,15 +48,15 @@ const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onDeleteExpense, on
                 <TableCell>{expense.title}</TableCell>
                 <TableCell>{expense.category}</TableCell>
                 <TableCell>{expense.paymentMode}</TableCell>
-                <TableCell>{expense.recurring ? 'Yes' : 'No'}</TableCell>
+                <TableCell>{t(expense.recurring ? 'recurring-value-yes' : 'recurring-value-no')}</TableCell>
                 <TableCell>{expense.beneficiary}</TableCell>
                 <TableCell>{expense.tags.join(', ')}</TableCell>
                 <TableCell>
                   <Button variant="contained" color="primary" onClick={() => onEditExpense(index)}>
-                    Edit
+                    {t("view-expense-row-action-edit")}
                   </Button>
                   <Button variant="contained" color="secondary" onClick={() => onDeleteExpense(index)} sx={{ ml: 2 }}>
-                    Delete
+                  {t("view-expense-row-action-delete")}
                   </Button>
                 </TableCell>
               </TableRow>

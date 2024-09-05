@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import ExpenseForm from '../components/ExpenseForm';
 import { IExpenseService } from '../services/IExpenseService';
 import { LocalStorageService } from '../services/LocalStorageService';
-import { Expense } from '../types/Expense';
+import { Expense, LocationState } from '../types/Expense';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { HeaderTab, TabPath } from '../constants/TabConstants';
 
 interface ExpenseFormPageProps {
   expenseService: IExpenseService;
@@ -17,7 +18,7 @@ export const ExpenseFormPage: React.FC<ExpenseFormPageProps> = ({ expenseService
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    const state = location.state as { expense: Expense, index: number } | undefined;
+    const state = location.state as LocationState;
     if (state) {
       setInitialExpenseData(state.expense);
       setEditingIndex(state.index);
@@ -27,16 +28,15 @@ export const ExpenseFormPage: React.FC<ExpenseFormPageProps> = ({ expenseService
   const handleSaveExpense = async (expense: Expense) => {
     if (editingIndex !== null) {
       await expenseService.updateExpense(editingIndex, expense);
-      setEditingIndex(null);
     } else {
       await expenseService.addExpense(expense);
     }
-    navigate('/expenses');
+    navigate(TabPath[HeaderTab.ViewExpenses]);
   };
 
   return (
     <div>
-      <ExpenseForm onSaveExpense={handleSaveExpense} initialData={initialExpenseData} />
+      <ExpenseForm onSaveExpense={handleSaveExpense} initialData={initialExpenseData} isEditForm={editingIndex !== null} />
     </div>
   );
 };
