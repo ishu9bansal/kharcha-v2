@@ -1,29 +1,27 @@
-// src/context/AuthContext.tsx
-import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
+import React, { createContext, useEffect, ReactNode, useContext } from 'react';
 import { generateCodeVerifier, generateCodeChallenge, pkceEnabled } from '../utils/pkce';
 import axios from 'axios';
-import { AuthScope, BaseUrl, CallbackUrl, CodeChallengeMethodS256, GoogleAuthUrl, GoogleTokenUrl, GrantTypeAuthorizationCode, KeyCodeVerifier, QueryParamClientId, QueryParamCode, QueryParamCodeChallenge, QueryParamCodeChallengeMethod, QueryParamRedirectUri, QueryParamResponseType, QueryParamScope, ResponseTypeCode } from '../constants/UrlConstants';
+import { AuthScope, BaseUrl, CallbackUrl, CodeChallengeMethodS256, GoogleAuthUrl, GoogleTokenUrl, GrantTypeAuthorizationCode, KeyCodeVerifier, QueryParamClientId, QueryParamCode, QueryParamCodeChallenge, QueryParamCodeChallengeMethod, QueryParamRedirectUri, QueryParamResponseType, QueryParamScope, RelativeAddExpense, ResponseTypeCode } from '../constants/UrlConstants';
+import { authError, setAccessToken } from '../store/slices/authSlice';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { HeaderTab, TabPath } from '../constants/TabConstants';
 
-interface AuthContextProps {
-  accessToken: string | null;
-  isAuthenticated: boolean;
-  login: () => void;
+interface LoginContextProps {
+  loginComponent: () => ReactNode;
 }
 
-const AuthContext = createContext<AuthContextProps>({
-  accessToken: null,
-  isAuthenticated: false,
-  login: () => {},
+const LoginContext = createContext<LoginContextProps>({
+  loginComponent: () => (<></>),
 });
 
 const reactAppClientId = pkceEnabled ? process.env.REACT_APP_CLIENT_ID : undefined;
 const reactAppClientSecret = pkceEnabled ? process.env.REACT_APP_CLIENT_SECRET : undefined;
 const redirectUri = `${process.env.REACT_APP_HOST_URL}${BaseUrl}${CallbackUrl}`;
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-
+export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   useEffect(() => {
     // 3. if 'code' is detected in the query params this part is executed
     // should we limit this to only look when the path is like /auth/callback ??
@@ -32,7 +30,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const storedCodeVerifier = sessionStorage.getItem(KeyCodeVerifier);
 
     if (code && storedCodeVerifier) {
-      exchangeCodeForToken(code, storedCodeVerifier);
+      exchangeCodeForToken(code, storedCodeVerifier)
+      .then((token: string) => dispatch(setAccessToken(token)))
+      .catch((error: string | null) => dispatch(authError(error)));
     }
   }, []);
 
@@ -48,12 +48,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         code_verifier: codeVerifier,
       });
 
-      setAccessToken(response.data.access_token);
-      setIsAuthenticated(true);
       sessionStorage.removeItem(KeyCodeVerifier);
-      window.history.replaceState({}, document.title, "/");
+      window.history.replaceState({}, document.title, `${BaseUrl}${RelativeAddExpense}`);
+      navigate(TabPath[HeaderTab.ViewExpenses]);
+      return response.data.access_token;
     } catch (error) {
-      console.error('Error exchanging code for token', error);
+      const errorString = `Error exchanging code for token`;
+      console.error(errorString, error);
+      throw errorString;
     }
   };
 
@@ -74,11 +76,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // 2. Google redirects the user on the redirect uri, with the code in the params
   };
 
+  const loginComponent = () => (
+    <button onClick={login}>Login with Google</button>
+  );
+
   return (
-    <AuthContext.Provider value={{ accessToken, isAuthenticated, login }}>
+    <LoginContext.Provider value={{ loginComponent }}>
       {children}
-    </AuthContext.Provider>
+    </LoginContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useLogin = () => useContext(LoginContext);

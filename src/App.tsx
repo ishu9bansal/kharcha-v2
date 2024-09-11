@@ -1,5 +1,4 @@
-// src/App.tsx
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { BrowserRouter as Router, Route, Routes, Link, useLocation } from "react-router-dom";
 import { AppBar, Tabs, Tab, Container } from "@mui/material";
 import { ExpenseFormPage } from "./pages/ExpenseFormPage";
@@ -7,30 +6,17 @@ import { ExpenseListPage } from "./pages/ExpenseListPage";
 import { contentContainerStyle, selectedTabStyle } from "./App.style";
 import { useTranslation } from "react-i18next";
 import { AllTabs, HeaderTab, TabLabel, TabPath } from "./constants/TabConstants";
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import { GoogleSheetsService } from "./services/GoogleSheetsService";
-import { IExpenseService } from "./services/IExpenseService";
-import { pkceEnabled } from "./utils/pkce";
-import { LocalStorageService } from "./services/LocalStorageService";
+import { LoginProvider, useLogin } from "./context/LoginContext";
+import { Provider, useSelector } from 'react-redux';
+import store from './store/store';
+import { selectAuth, useExpenseServiceLocator } from "./store/slices/authSlice";
+import { BaseUrl } from "./constants/UrlConstants";
 
 function App() {
   const location = useLocation();
-  const [ expenseService, setExpenseService ] = useState<IExpenseService | null>(null);
-  const { accessToken, isAuthenticated, login } = useAuth();
-  
-  const expenseServiceInstantiator = async (pkceEnabled: boolean, isAuthenticated: boolean, accessToken: string | null): Promise<IExpenseService | null> => {
-    if (!pkceEnabled) {
-      return LocalStorageService.getInstance();
-    }
-    if (isAuthenticated && accessToken) {
-      return await GoogleSheetsService.getInstance(accessToken);
-    }
-    return null;
-  }
-
-  useEffect(() => {
-    expenseServiceInstantiator(pkceEnabled, isAuthenticated, accessToken).then(setExpenseService);
-  }, [setExpenseService, isAuthenticated, accessToken]);
+  const { loginComponent } = useLogin();
+  const { service: expenseService } = useSelector(selectAuth);
+  useExpenseServiceLocator();
 
   const getActiveTab = useCallback(() => {
     return AllTabs.findIndex((tab: HeaderTab) => TabPath[tab] === location.pathname);
@@ -62,7 +48,7 @@ function App() {
             <Route path={TabPath[HeaderTab.ViewExpenses]} element={<ExpenseListPage expenseService={expenseService} />} />
           </Routes>
         ) : (
-          <button onClick={login}>Login with Google</button>
+          loginComponent()
         )}
       </Container>
     </>
@@ -71,42 +57,12 @@ function App() {
 
 export default function AppWithRouter() {
   return (
-    <Router basename="/kharcha-v2">
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </Router>
+    <Provider store={store}>
+      <Router basename={BaseUrl}>
+        <LoginProvider>
+          <App />
+        </LoginProvider>
+      </Router>
+    </Provider>
   );
 }
-
-
-/**
- * Modifications made to the code and next steps
- * 
- * ChatGPT code:
- *  pkce integration
- *  AuthContext
- *  GooggleSheetsService
- *  googleSheetsHelper
- *  auth context modifications in App.tsx
- * 
- * Modifications:
- *  Addition of client_secret in AuthContext
- *  Dont export the local service injected Pages by default
- *  Modify GoogleSheetsService to not use useAuth method, and set accessToken in instance
- *  Delete unnecessary UserSheetManager file
- *  change target in tsconfig file
- *  pick client id and secret from env variables or default in code
- * 
- * Next steps:
- *  Google drive get and create methods are out of scope of the current token
- *  Improve login experience
- *  Masking client id and secret
- *  local and sheet hybrid
- * 
- * Bug fixes:
- *  access token expiry handling
- *  expense serialize - deserialize
- *  create new sheet with the column names
- *  
- */
