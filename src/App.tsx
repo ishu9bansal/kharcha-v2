@@ -7,16 +7,15 @@ import { contentContainerStyle, selectedTabStyle } from "./App.style";
 import { useTranslation } from "react-i18next";
 import { AllTabs, HeaderTab, TabLabel, TabPath } from "./constants/TabConstants";
 import { LoginProvider, useLogin } from "./context/LoginContext";
-import { Provider, useSelector } from 'react-redux';
+import { Provider } from 'react-redux';
 import store from './store/store';
-import { selectAuth, useExpenseServiceLocator } from "./store/slices/authSlice";
+import { useExpenseService } from "./store/slices/authSlice";
 import { BaseUrl } from "./constants/UrlConstants";
 
 function App() {
   const location = useLocation();
   const { loginComponent } = useLogin();
-  const { service: expenseService } = useSelector(selectAuth);
-  useExpenseServiceLocator();
+  const { expenseService, isAuthenticated } = useExpenseService();
 
   const getActiveTab = useCallback(() => {
     return AllTabs.findIndex((tab: HeaderTab) => TabPath[tab] === location.pathname);
@@ -48,7 +47,7 @@ function App() {
             <Route path={TabPath[HeaderTab.ViewExpenses]} element={<ExpenseListPage />} />
           </Routes>
         ) : (
-          loginComponent()
+          loginComponent(isAuthenticated)
         )}
       </Container>
     </>

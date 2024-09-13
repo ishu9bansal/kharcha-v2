@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { HeaderTab, TabPath } from '../constants/TabConstants';
 
 interface LoginContextProps {
-  loginComponent: () => ReactNode;
+  loginComponent: (isAuthenticated: boolean) => ReactNode;
 }
 
 const LoginContext = createContext<LoginContextProps>({
@@ -76,8 +76,12 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     // 2. Google redirects the user on the redirect uri, with the code in the params
   };
 
-  const loginComponent = () => (
-    <button onClick={login}>Login with Google</button>
+  const loginComponent = (isAuthenticated: boolean) => (
+    isAuthenticated ? (
+      <>Loading...</>
+    ) : (
+      <button onClick={login}>Login with Google</button>
+    )
   );
 
   return (

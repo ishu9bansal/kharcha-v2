@@ -7,3 +7,8 @@ export interface IExpenseService {
   updateExpense(index: number, expense: Expense): Promise<void>;
   deleteExpense(index: number): Promise<void>;
 }
+
+export enum ExpenseServiceEnum {
+  LocalStorage,
+  GoogleSheets,
+}

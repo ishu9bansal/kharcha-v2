@@ -4,18 +4,21 @@ import { Expense } from '../types/Expense';
 import { GoogleSheetsClient } from '../clients/GoogleSheetsClient';
 
 export class GoogleSheetsService implements IExpenseService {
-  private static instance: GoogleSheetsService;
+  private static instance: GoogleSheetsService | null = null;
   private client: GoogleSheetsClient;
   private constructor() {
     this.client = new GoogleSheetsClient();
   }
 
-  public static async getInstance(accessToken: string): Promise<GoogleSheetsService> {
+  public static getInstance(): GoogleSheetsService | null {
+    return GoogleSheetsService.instance;
+  }
+
+  public static async initWithAccessToken(accessToken: string): Promise<void> {
     if (!GoogleSheetsService.instance) {
       GoogleSheetsService.instance = new GoogleSheetsService();
     }
     await GoogleSheetsService.instance.setAccessToken(accessToken);
-    return GoogleSheetsService.instance;
   }
 
   public async setAccessToken(accessToken: string) {

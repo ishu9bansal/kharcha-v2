@@ -3,8 +3,9 @@ import { setNotification } from '../store/slices/uiSlice';
 import { ExpenseActionTypes, revertAddExpense, revertDeleteExpense, revertUpdateExpense, setExpensesList } from '../store/slices/expensesSlice';
 import { IExpenseService } from '../services/IExpenseService';
 import { Expense } from '../types/Expense';
-import { AppDispatch } from '../store/store';
+import { AppDispatch, RootState } from '../store/store';
 import { debounce } from '@mui/material';
+import { getServiceFromEnum } from '../utils/expenseService';
 
 // TODO: improve the stability by adding a middleware
 // which just syncs the whole expense list in one go, along with some debounce logic
@@ -62,10 +63,12 @@ const fetchExpenses = debounce(async (dispatch: AppDispatch, service: IExpenseSe
 }, 1000);
 
 const expenseServiceMiddleware: Middleware = ({ dispatch, getState }) => next => async (action) => {
-    const state = getState();
-    const service = state.auth.service; // Get current expense service
+    const state = getState() as RootState;
+    const serviceEnum = state.auth.serviceEnum; // Get current expense service
+    const service = getServiceFromEnum(serviceEnum);
     if(!service) {
-        dispatch(setNotification('Service not ready'));
+        // TODO: bug fix, somehow leading to long call stack
+        // dispatch(setNotification('Service not ready'));
         return next(action);
     }
 
