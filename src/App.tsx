@@ -44,8 +44,8 @@ function App() {
       <Container sx={contentContainerStyle}>
         {expenseService ? (
           <Routes>
-            <Route path={TabPath[HeaderTab.AddExpense]} element={<ExpenseFormPage expenseService={expenseService} />} />
-            <Route path={TabPath[HeaderTab.ViewExpenses]} element={<ExpenseListPage expenseService={expenseService} />} />
+            <Route path={TabPath[HeaderTab.AddExpense]} element={<ExpenseFormPage />} />
+            <Route path={TabPath[HeaderTab.ViewExpenses]} element={<ExpenseListPage />} />
           </Routes>
         ) : (
           loginComponent()

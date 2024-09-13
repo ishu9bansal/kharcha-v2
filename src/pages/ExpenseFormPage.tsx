@@ -1,21 +1,19 @@
 // src/pages/ExpenseFormPage.tsx
 import React, { useState } from 'react';
 import ExpenseForm from '../components/ExpenseForm';
-import { IExpenseService } from '../services/IExpenseService';
-import { LocalStorageService } from '../services/LocalStorageService';
 import { Expense, LocationState } from '../types/Expense';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { HeaderTab, TabPath } from '../constants/TabConstants';
+import { addExpense, updateExpense } from '../store/slices/expensesSlice';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store/store';
 
-interface ExpenseFormPageProps {
-  expenseService: IExpenseService;
-}
-
-export const ExpenseFormPage: React.FC<ExpenseFormPageProps> = ({ expenseService }) => {
+export const ExpenseFormPage: React.FC = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [initialExpenseData, setInitialExpenseData] = useState<Expense | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   React.useEffect(() => {
     const state = location.state as LocationState;
@@ -27,9 +25,9 @@ export const ExpenseFormPage: React.FC<ExpenseFormPageProps> = ({ expenseService
 
   const handleSaveExpense = async (expense: Expense) => {
     if (editingIndex !== null) {
-      await expenseService.updateExpense(editingIndex, expense);
+      dispatch(updateExpense({ index: editingIndex, expense }));
     } else {
-      await expenseService.addExpense(expense);
+      dispatch(addExpense(expense));
     }
     navigate(TabPath[HeaderTab.ViewExpenses]);
   };
@@ -40,6 +38,3 @@ export const ExpenseFormPage: React.FC<ExpenseFormPageProps> = ({ expenseService
     </div>
   );
 };
-
-// Use Singleton instance of LocalStorageService by default
-export const LocalExpenseFormPage = () => <ExpenseFormPage expenseService={LocalStorageService.getInstance()} />;
