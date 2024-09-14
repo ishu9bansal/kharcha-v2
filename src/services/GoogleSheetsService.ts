@@ -47,4 +47,9 @@ export class GoogleSheetsService implements IExpenseService {
     // Assuming Sheet1 is the first sheet hence pageIndex 0
     // index+1 for column names
   }
+
+  public async setExpenses(expenses: Expense[]): Promise<void> {
+    const data = expenses.map(this.client.serialize);
+    await this.client.bulkUpdateSheetFromRow(1,data); // First row is the column names
+  }
 }

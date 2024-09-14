@@ -26,18 +26,22 @@ export class LocalStorageService implements IExpenseService {
   async addExpense(expense: Expense): Promise<void> {
     const expenses = await this.getExpenses();
     expenses.push(expense);
-    this.client.saveExpensesToLocalStorage(expenses);
+    await this.setExpenses(expenses);
   }
 
   async updateExpense(index: number, expense: Expense): Promise<void> {
     const expenses = await this.getExpenses();
     expenses[index] = expense;
-    this.client.saveExpensesToLocalStorage(expenses);
+    await this.setExpenses(expenses);
   }
 
   async deleteExpense(index: number): Promise<void> {
     const expenses = await this.getExpenses();
     expenses.splice(index, 1);
+    await this.setExpenses(expenses);
+  }
+
+  async setExpenses(expenses: Expense[]): Promise<void> {
     this.client.saveExpensesToLocalStorage(expenses);
   }
 }

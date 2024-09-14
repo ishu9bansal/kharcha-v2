@@ -2,8 +2,9 @@ import { ExpenseField } from "../types/ExpenseField";
 import { appendSheetDataUri, batchUpdateSheetUri, generateHeaders, generateParamsForRequest, getSheetDataUri, GoogleApiDriveUrl, GoogleApiSpreadsheetsUrl, HeaderKeyContentType, mimeTypeSpreadSheet, searchFileByNameQuery, sheetName, sheetPageName, updateSheetRowUri } from "../constants/GoogleSheetsConstants";
 import axios from "axios";
 import { Beneficiary, Expense, PaymentMode } from "../types/Expense";
+import { IExpenseTypeConverter } from "./IExpenseTypeConverter";
 
-export class GoogleSheetsClient {
+export class GoogleSheetsClient implements IExpenseTypeConverter<string[]> {
     private static TRUE = 'TRUE';
     private static FALSE = 'FALSE';
 
@@ -131,6 +132,41 @@ export class GoogleSheetsClient {
                 },
             },
         ];
+        await axios.post(batchUpdateSheetUri(this.spreadsheetId), { requests }, { headers });
+    };
+
+    public async bulkUpdateSheetFromRow(startRowIndex: number, data: string[][]): Promise<void> {
+        const headers = generateHeaders(this.accessToken);
+    
+        const requests = [
+            // 1️⃣ Clear all data starting from the second row (keep first row intact)
+            {
+                deleteRange: {
+                    range: {
+                        sheetId: this.sheetPageIndex,
+                        startRowIndex, // Start from the second row (row index is 0-based)
+                    },
+                    shiftDimension: 'ROWS', // Delete rows
+                },
+            },
+            // 2️⃣ Add new data starting from the second row
+            {
+                updateCells: {
+                    range: {
+                        sheetId: this.sheetPageIndex,
+                        startRowIndex,
+                    },
+                    rows: data.map((row) => ({
+                        values: row.map((cell) => ({
+                            userEnteredValue: { stringValue: cell },
+                        })),
+                    })),
+                    fields: 'userEnteredValue',
+                },
+            },
+        ];
+    
+        // Sending batch request to delete and then update
         await axios.post(batchUpdateSheetUri(this.spreadsheetId), { requests }, { headers });
     };
 

@@ -6,6 +6,7 @@ import { Expense } from '../types/Expense';
 import { AppDispatch, RootState } from '../store/store';
 import { debounce } from '@mui/material';
 import { getServiceFromEnum } from '../utils/expenseService';
+import { AuthActionTypes } from '../store/slices/authSlice';
 
 // TODO: improve the stability by adding a middleware
 // which just syncs the whole expense list in one go, along with some debounce logic
@@ -74,23 +75,23 @@ const expenseServiceMiddleware: Middleware = ({ dispatch, getState }) => next =>
 
     // actually the type of action will not only be this in runtime
     // but all other case will go in default case so this is safe
-    const localAction = action as ExpenseActionTypes;
-    switch (localAction.type) {
+    const expenseAction = action as ExpenseActionTypes;
+    switch (expenseAction.type) {
         case 'expenses/addExpense': {
-            const expense = localAction.payload;
+            const expense = expenseAction.payload;
             addExpense(dispatch, service, expense);
             break;
         }
 
         case 'expenses/updateExpense': {
-            const { index, expense: updatedExpense } = localAction.payload;
+            const { index, expense: updatedExpense } = expenseAction.payload;
             const currentExpense = getState().expenses.list[index];
             updateExpense(dispatch, service, index, updatedExpense, currentExpense);
             break;
         }
 
         case 'expenses/deleteExpense': {
-            const index = localAction.payload;
+            const index = expenseAction.payload;
             const currentExpense = getState().expenses.list[index];
             deleteExpense(dispatch, service, index, currentExpense);
             break;
@@ -104,7 +105,21 @@ const expenseServiceMiddleware: Middleware = ({ dispatch, getState }) => next =>
         default:    break;
     }
 
-    return next(localAction); // Always pass the action to the next middleware or reducer
+    const nextResult = next(action);
+
+    // TODO: fix first call missing
+    const authAction = action as AuthActionTypes;
+    switch(authAction.type) {
+        case 'auth/authError':
+        case 'auth/setAccessToken':
+        case 'auth/setExpenseServiceEnum': {
+            fetchExpenses(dispatch, service);
+            break;
+        }
+        default: break;
+    }
+
+    return nextResult;
 };
 
 export default expenseServiceMiddleware;

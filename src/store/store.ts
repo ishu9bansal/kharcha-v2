@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import expensesReducer from './slices/expensesSlice';
 import uiReducer from './slices/uiSlice';
-import expenseServiceMiddleware from '../middleware/expenseServiceMiddleware';
+import expenseSyncMiddleware from '../middleware/expenseSyncMiddleware';
 
 const store = configureStore({
   reducer: {
@@ -12,7 +12,7 @@ const store = configureStore({
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
     thunk: true,
-  }).concat(expenseServiceMiddleware),
+  }).concat(expenseSyncMiddleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

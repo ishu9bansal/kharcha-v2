@@ -6,6 +6,7 @@ export interface IExpenseService {
   addExpense(expense: Expense): Promise<void>;
   updateExpense(index: number, expense: Expense): Promise<void>;
   deleteExpense(index: number): Promise<void>;
+  setExpenses(expenses: Expense[]): Promise<void>;
 }
 
 export enum ExpenseServiceEnum {
