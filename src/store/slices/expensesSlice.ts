@@ -1,7 +1,7 @@
 // src/store/slices/expensesSlice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Expense } from '../../types/Expense';
-import { RootState } from '../store';
+import { RootState, SliceActions } from '../store';
 
 interface ExpensesState {
   list: Expense[];
@@ -66,12 +66,8 @@ export const {
   revertDeleteExpense,
   setExpensesList,
 } = expensesSlice.actions;
-export const selectExpenses = (state: RootState) => state.expenses;
-
-type SliceActions<T> = {
-  [K in keyof T]: T[K] extends (...args: any[]) => infer A ? A : never;
-}[keyof T]
-
+const selectExpensesState = (state: RootState) => state.expenses;
+export const selectExpenses = createSelector([selectExpensesState], expenses => expenses.list);
 export type ExpenseActionTypes = SliceActions<typeof expensesSlice.actions>;
 
 export default expensesSlice.reducer;
