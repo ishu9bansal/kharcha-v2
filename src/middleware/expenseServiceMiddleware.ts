@@ -8,9 +8,6 @@ import { debounce } from '@mui/material';
 import { getServiceFromEnum } from '../utils/expenseService';
 import { AuthActionTypes } from '../store/slices/authSlice';
 
-// TODO: improve the stability by adding a middleware
-// which just syncs the whole expense list in one go, along with some debounce logic
-
 const addExpense = async (dispatch: AppDispatch, service: IExpenseService, expense: Expense): Promise<void> => {
     try {
         // Trigger API call to add expense
@@ -63,35 +60,30 @@ const fetchExpenses = debounce(async (dispatch: AppDispatch, service: IExpenseSe
     }
 }, 1000);
 
-const expenseServiceMiddleware: Middleware = ({ dispatch, getState }) => next => async (action) => {
+function preInterceptOperation(dispatch: AppDispatch, getState: () => RootState, action: ExpenseActionTypes): void {
     const state = getState() as RootState;
     const serviceEnum = state.auth.serviceEnum; // Get current expense service
     const service = getServiceFromEnum(serviceEnum);
     if(!service) {
-        // TODO: bug fix, somehow leading to long call stack
-        // dispatch(setNotification('Service not ready'));
-        return next(action);
+        return;
     }
 
-    // actually the type of action will not only be this in runtime
-    // but all other case will go in default case so this is safe
-    const expenseAction = action as ExpenseActionTypes;
-    switch (expenseAction.type) {
+    switch (action.type) {
         case 'expenses/addExpense': {
-            const expense = expenseAction.payload;
+            const expense = action.payload;
             addExpense(dispatch, service, expense);
             break;
         }
 
         case 'expenses/updateExpense': {
-            const { index, expense: updatedExpense } = expenseAction.payload;
+            const { index, expense: updatedExpense } = action.payload;
             const currentExpense = getState().expenses.list[index];
             updateExpense(dispatch, service, index, updatedExpense, currentExpense);
             break;
         }
 
         case 'expenses/deleteExpense': {
-            const index = expenseAction.payload;
+            const index = action.payload;
             const currentExpense = getState().expenses.list[index];
             deleteExpense(dispatch, service, index, currentExpense);
             break;
@@ -104,12 +96,16 @@ const expenseServiceMiddleware: Middleware = ({ dispatch, getState }) => next =>
 
         default:    break;
     }
+}
 
-    const nextResult = next(action);
-
-    // TODO: fix first call missing
-    const authAction = action as AuthActionTypes;
-    switch(authAction.type) {
+function postInterceptOperation(dispatch: AppDispatch, getState: () => RootState, action: AuthActionTypes): void {
+    const state = getState() as RootState;
+    const serviceEnum = state.auth.serviceEnum; // Get current expense service
+    const service = getServiceFromEnum(serviceEnum);
+    if(!service) {
+        return;
+    }
+    switch(action.type) {
         case 'auth/authError':
         case 'auth/setAccessToken':
         case 'auth/setExpenseServiceEnum': {
@@ -118,7 +114,12 @@ const expenseServiceMiddleware: Middleware = ({ dispatch, getState }) => next =>
         }
         default: break;
     }
+}
 
+const expenseServiceMiddleware: Middleware = ({ dispatch, getState }) => next => async (action) => {
+    preInterceptOperation(dispatch, getState, action as ExpenseActionTypes);
+    const nextResult = next(action);
+    postInterceptOperation(dispatch, getState, action as AuthActionTypes);
     return nextResult;
 };
 
